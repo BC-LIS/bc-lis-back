@@ -18,16 +18,14 @@ public class DocumentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
-
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Lob
-    @Column(name = "content", nullable = false)
-    private byte[] content;
+    @Column(name = "description", nullable = false)
+    private String description;
+
+    @Column(name = "object_name", nullable = false)
+    private String objectName;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -39,14 +37,32 @@ public class DocumentEntity {
     @Column(name = "state", nullable = false)
     private DocumentState state;
 
-    @ManyToOne
-    @JoinColumn(name = "type_id", nullable = false)
-    private TypeEntity type;
-
     public enum DocumentState {
         DRAFT,
         PUBLISHED,
         ARCHIVED
     }
-}
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+    /*
+    @ManyToOne
+    @JoinColumn(name = "type_id", nullable = false)
+    private TypeEntity type;
+
+@ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
+
+
+}
+     */
+}
