@@ -3,61 +3,64 @@ package com.bclis.controller;
 import com.bclis.dto.request.DocumentCreateDTO;
 import com.bclis.dto.response.DocumentResponseDTO;
 import com.bclis.service.DocumentService;
-import com.bclis.utils.constans.ApiDescription;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/documents")
-@Tag(name = "Document management", description = ApiDescription.DOCUMENT_CONTROLLER_DESCRIPTION)
 public class DocumentController {
 
-    private final DocumentService documentService;
+    @Autowired
+    private DocumentService documentService;
 
-    public DocumentController(DocumentService documentService) {
-        this.documentService = documentService;
+
+    @GetMapping("/test")
+    public ResponseEntity<String> testEndpoint() {
+        return ResponseEntity.ok("Test endpoint is working!");
     }
 
-    @PostMapping
-    @Operation(summary = "Create document", description = ApiDescription.CREATE_DOCUMENT_DESCRIPTION)
-    public ResponseEntity<DocumentResponseDTO> createDocument(@RequestBody DocumentCreateDTO documentCreateDTO) {
-        DocumentResponseDTO documentResponse = documentService.createDocument(documentCreateDTO);
-        return ResponseEntity.ok(documentResponse);
+    // Endpoint para crear un nuevo documento
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<DocumentResponseDTO> createDocument(@ModelAttribute DocumentCreateDTO documentDTO) {
+        try {
+            DocumentResponseDTO response = documentService.createDocument(documentDTO);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // Manejo de errores
+            return ResponseEntity.badRequest().body(null); // O puedes lanzar una excepción personalizada
+        }
     }
 
+    // Endpoint para obtener información de un documento por ID
     @GetMapping("/{id}")
-    @Operation(summary = "Get document by id", description = ApiDescription.GET_DOCUMENT_DESCRIPTION)
     public ResponseEntity<DocumentResponseDTO> getDocumentById(@PathVariable Long id) {
-        return documentService.getDocumentById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        try {
+            DocumentResponseDTO response = documentService.getDocumentById(id);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // Manejar excepción en caso de que no se encuentre el documento
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @GetMapping
-    @Operation(summary = "Get all document", description = ApiDescription.GET_ALL_DOCUMENT_DESCRIPTION)
-    public List<DocumentResponseDTO> getAllDocuments() {
-        return documentService.getAllDocuments();
+    // Endpoint para descargar un documento por ID
+    @GetMapping("/{id}/download")
+    public ResponseEntity<byte[]> downloadDocument(@PathVariable Long id) {
+        try {
+            return documentService.downloadDocument(id);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @PutMapping("/{id}")
-    @Operation(summary = "Update document by id", description = ApiDescription.UPDATE_DOCUMENT_DESCRIPTION)
-    public ResponseEntity<DocumentResponseDTO> updateDocument(@PathVariable Long id, @RequestBody DocumentCreateDTO documentCreateDTO) {
-        return documentService.updateDocument(id, documentCreateDTO)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Delete document by id", description = ApiDescription.DELETE_DOCUMENT_DESCRIPTION)
-    public ResponseEntity<Void> deleteDocument(@PathVariable Long id) {
-        if (documentService.deleteDocument(id)) {
-            return ResponseEntity.ok().build();
-        } else {
+    // Endpoint para obtener información del documento y descargar el archivo en una sola petición
+    @GetMapping("/{id}/info-and-download")
+    public ResponseEntity<byte[]> getDocumentWithInfo(@PathVariable Long id) {
+        try {
+            return documentService.getDocumentWithInfo(id);
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
