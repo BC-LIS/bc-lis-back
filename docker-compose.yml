@@ -24,7 +24,23 @@ services:
     volumes:
       - mysql:/var/lib/mysql
 
+  minio:
+    image: minio/minio
+    restart: always
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    env_file: ./.env
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER_PROD}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD_PROD}
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
 
 volumes:
   mysql:
+    external: true
+  minio_data:
     external: true
