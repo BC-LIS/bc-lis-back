@@ -1,11 +1,10 @@
 package com.bclis.controller;
 
+import com.bclis.dto.request.CreateCategoryDTO;
 import com.bclis.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,5 +24,11 @@ public class CategoryController {
     public ResponseEntity<List<String>> getAllCategories() {
         List<String> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
+    }
+
+    @PostMapping
+    public ResponseEntity<String> createCategory(@RequestBody CreateCategoryDTO categoryDTO) {
+        categoryService.createCategory(categoryDTO);
+        return ResponseEntity.ok("Category created");
     }
 }
