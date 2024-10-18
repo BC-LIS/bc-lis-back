@@ -53,16 +53,14 @@ public class DocumentEntity {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-    /*
+
     @ManyToOne
     @JoinColumn(name = "type_id", nullable = false)
     private TypeEntity type;
 
-@ManyToOne
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
 
-}
-     */
 }
