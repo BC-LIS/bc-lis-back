@@ -5,7 +5,7 @@ import com.bclis.persistence.entity.CategoryEntity;
 import com.bclis.persistence.repository.CategoryRepository;
 import com.bclis.persistence.repository.DocumentCategoryRepository;
 import com.bclis.utils.exceptions.AlreadyExistsException;
-import com.bclis.utils.exceptions.CategoryNotFoundException;
+import com.bclis.utils.exceptions.NotFoundException;
 import com.bclis.utils.exceptions.DependentResourceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,13 +44,13 @@ public class CategoryService {
         CategoryEntity categoryEntity = categoryRepository.findByName(categoryDTO.getCategoryName());
 
         if (categoryEntity == null) {
-            throw new CategoryNotFoundException("Category does not exist");
+            throw new NotFoundException("Category does not exist");
         }
 
         boolean existDocumentDependicies = documentCategoryRepository.existsByCategoryId(categoryEntity.getId());
 
         if (existDocumentDependicies){
-            throw new DependentResourceException("There are dependent resources that prevent this operation");
+            throw new DependentResourceException("There are dependencies for this category that prevent this action");
         }
 
         categoryRepository.delete(categoryEntity);
