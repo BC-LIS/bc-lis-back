@@ -1,11 +1,10 @@
 package com.bclis.controller;
 
+import com.bclis.dto.request.TypeDTO;
 import com.bclis.service.TypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,5 +19,17 @@ public class TypeController {
     public ResponseEntity<List<String>> getAllTypes() {
         List<String> types = typeService.getAllTypes();
         return ResponseEntity.ok(types);
+    }
+
+    @PostMapping
+    public ResponseEntity<String> createType(@RequestBody TypeDTO typeDTO) {
+        typeService.createType(typeDTO);
+        return ResponseEntity.ok("Type created");
+    }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteType(@RequestBody TypeDTO typeDTO) {
+        typeService.deleteType(typeDTO);
+        return ResponseEntity.ok("Type deleted successfully");
     }
 }

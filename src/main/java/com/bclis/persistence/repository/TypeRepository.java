@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TypeRepository extends JpaRepository<TypeEntity, Long> {
+    boolean existsByName(String name);
+    TypeEntity findByName(String name);
 }
