@@ -33,10 +33,10 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/auth/login").permitAll();
-//                    auth.requestMatchers("/**").permitAll();
-                    auth.requestMatchers("/auth/register").hasRole("ADMIN");
+                    auth.requestMatchers("/auth/login", "/categories/**").permitAll();
                     auth.requestMatchers("/v1/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
+                    auth.requestMatchers("/auth/register").hasRole("ADMIN");
+//                    auth.requestMatchers("/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
