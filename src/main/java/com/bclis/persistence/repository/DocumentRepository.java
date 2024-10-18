@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> {
-
+    boolean existsByTypeId(Long id);
 }
