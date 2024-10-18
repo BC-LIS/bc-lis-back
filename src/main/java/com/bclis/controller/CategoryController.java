@@ -1,6 +1,6 @@
 package com.bclis.controller;
 
-import com.bclis.dto.request.CreateCategoryDTO;
+import com.bclis.dto.request.CategoryDTO;
 import com.bclis.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +15,6 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok("This a test for category controller");
-    }
-
     @GetMapping
     public ResponseEntity<List<String>> getAllCategories() {
         List<String> categories = categoryService.getAllCategories();
@@ -27,8 +22,14 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createCategory(@RequestBody CreateCategoryDTO categoryDTO) {
+    public ResponseEntity<String> createCategory(@RequestBody CategoryDTO categoryDTO) {
         categoryService.createCategory(categoryDTO);
         return ResponseEntity.ok("Category created");
+    }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteCategoryByName(@RequestBody CategoryDTO categoryDTO) {
+        categoryService.deleteCategoryByName(categoryDTO);
+        return ResponseEntity.ok("Category deleted successfully");
     }
 }
