@@ -30,7 +30,14 @@ public class DocumentFilterService {
 
             if (filter.equalsIgnoreCase("description")) {
                 specification = specification.and(documentSpecification.containsAttribute(filter, value));
-            } else if (value instanceof String) {
+            }
+            else if (filter.equalsIgnoreCase("typeName")) {
+                specification = specification.and(documentSpecification.hasRelatedAttribute("name", value, "type"));
+            }
+            else if (filter.equalsIgnoreCase("username")) {
+                specification = specification.and(documentSpecification.hasRelatedAttribute("username", value, "users"));
+            }
+            else if (value instanceof String) {
                 specification = specification.and(documentSpecification.hasAttribute(filter, value));
             }
         }
