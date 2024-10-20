@@ -4,8 +4,10 @@ import com.bclis.dto.request.DocumentCreateDTO;
 import com.bclis.dto.response.DocumentResponseDTO;
 import com.bclis.persistence.entity.DocumentEntity;
 import com.bclis.persistence.entity.TypeEntity;
+import com.bclis.persistence.entity.UserEntity;
 import com.bclis.persistence.repository.DocumentRepository;
 import com.bclis.persistence.repository.TypeRepository;
+import com.bclis.persistence.repository.UserRepository;
 import com.bclis.utils.exceptions.NotFoundException;
 import io.minio.*;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class DocumentService {
 
     private final DocumentRepository documentRepository;
     private final TypeRepository typeRepository;
+    private final UserRepository userRepository;
     private final MinioClient minioClient;
     private final ModelMapper modelMapper;
 
@@ -59,9 +62,13 @@ public class DocumentService {
         TypeEntity typeEntity = typeRepository.findByName(documentDTO.getTypeName())
                 .orElseThrow(() -> new NotFoundException("Type not found"));
 
+        UserEntity userEntity = userRepository.findByUsername(documentDTO.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+
         // Asignar el nombre del objeto en MinIO
         document.setObjectName(objectName);
         document.setType(typeEntity);
+        document.setUser(userEntity);
 
         // Guardar el documento en la base de datos
         DocumentEntity savedDocument = documentRepository.save(document);
@@ -69,7 +76,6 @@ public class DocumentService {
         // Convertir la entidad guardada en DocumentResponseDTO usando ModelMapper
         return modelMapper.map(savedDocument, DocumentResponseDTO.class);
     }
-
 
     // Método para obtener información de un documento por ID
     public DocumentResponseDTO getDocumentById(Long id) {

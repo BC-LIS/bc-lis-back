@@ -15,5 +15,6 @@ public class DocumentCreateDTO {
     private MultipartFile file;
     private DocumentEntity.DocumentState state;
     private String typeName;
+    private String username;
 }
 
