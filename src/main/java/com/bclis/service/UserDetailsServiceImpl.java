@@ -8,6 +8,7 @@ import com.bclis.persistence.entity.UserEntity;
 import com.bclis.persistence.entity.enums.EnumRole;
 import com.bclis.persistence.repository.RoleRepository;
 import com.bclis.persistence.repository.UserRepository;
+import com.bclis.utils.exceptions.NotFoundException;
 import com.bclis.utils.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -95,7 +96,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         RoleEntity roleEntity = roleRepository
                 .findByRoleName(EnumRole.valueOf(createUserDTO.getRole()))
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new NotFoundException("Role not found"));
 
         UserEntity userEntity = UserEntity.builder()
                 .username(createUserDTO.getUsername())
