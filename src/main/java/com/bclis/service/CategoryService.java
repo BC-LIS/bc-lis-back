@@ -41,11 +41,8 @@ public class CategoryService {
     }
 
     public void deleteCategoryByName(CategoryDTO categoryDTO){
-        CategoryEntity categoryEntity = categoryRepository.findByName(categoryDTO.getCategoryName());
-
-        if (categoryEntity == null) {
-            throw new NotFoundException("Category does not exist");
-        }
+        CategoryEntity categoryEntity = categoryRepository.findByName(categoryDTO.getCategoryName())
+                .orElseThrow(() -> new NotFoundException("Category not found"));
 
         boolean existDocumentDependicies = documentCategoryRepository.existsByCategoryId(categoryEntity.getId());
 

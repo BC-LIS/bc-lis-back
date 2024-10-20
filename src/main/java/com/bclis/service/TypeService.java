@@ -41,11 +41,8 @@ public class TypeService {
     }
 
     public void deleteType(TypeDTO typeDTO) {
-        TypeEntity typeEntity = typeRepository.findByName(typeDTO.getTypeName());
-
-        if (typeEntity == null) {
-            throw new NotFoundException("Type not found");
-        }
+        TypeEntity typeEntity = typeRepository.findByName(typeDTO.getTypeName())
+                .orElseThrow(() -> new NotFoundException("Type not found"));
 
         boolean existsTypeDependecies = documentRepository.existsByTypeId(typeEntity.getId());
 
