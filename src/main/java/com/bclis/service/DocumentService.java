@@ -32,6 +32,9 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final TypeRepository typeRepository;
     private final UserRepository userRepository;
+
+    private final DocumentCategoryService documentCategoryService;
+
     private final MinioClient minioClient;
     private final ModelMapper modelMapper;
 
@@ -73,6 +76,8 @@ public class DocumentService {
 
         // Guardar el documento en la base de datos
         DocumentEntity savedDocument = documentRepository.save(document);
+
+        documentCategoryService.createDocumentCategoryService(documentDTO.getCategories(), document);
 
         // Convertir la entidad guardada en DocumentResponseDTO usando ModelMapper
         return modelMapper.map(savedDocument, DocumentResponseDTO.class);
