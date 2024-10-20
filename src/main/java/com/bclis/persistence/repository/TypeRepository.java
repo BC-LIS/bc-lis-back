@@ -1,11 +1,11 @@
 package com.bclis.persistence.repository;
 
-import com.bclis.persistence.entity.CategoryEntity;
+import com.bclis.persistence.entity.TypeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
+public interface TypeRepository extends JpaRepository<TypeEntity, Long> {
     boolean existsByName(String name);
-    CategoryEntity findByName(String name);
+    TypeEntity findByName(String name);
 }
