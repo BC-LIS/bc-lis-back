@@ -3,14 +3,19 @@ package com.bclis.service;
 import com.bclis.dto.request.DocumentCreateDTO;
 import com.bclis.dto.response.DocumentResponseDTO;
 import com.bclis.persistence.entity.DocumentEntity;
+import com.bclis.persistence.entity.TypeEntity;
 import com.bclis.persistence.repository.DocumentRepository;
+import com.bclis.persistence.repository.TypeRepository;
+import com.bclis.utils.exceptions.NotFoundException;
 import io.minio.*;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,16 +23,13 @@ import java.io.InputStream;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class DocumentService {
 
-    @Autowired
-    private MinioClient minioClient;
-
-    @Autowired
-    private DocumentRepository documentRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
+    private final DocumentRepository documentRepository;
+    private final TypeRepository typeRepository;
+    private final MinioClient minioClient;
+    private final ModelMapper modelMapper;
 
     @Value("${minio.bucket-name}")
     private String bucketName;
@@ -54,8 +56,12 @@ public class DocumentService {
         // Convertir el DTO en la entidad Document usando ModelMapper
         DocumentEntity document = modelMapper.map(documentDTO, DocumentEntity.class);
 
+        TypeEntity typeEntity = typeRepository.findByName(documentDTO.getTypeName())
+                .orElseThrow(() -> new NotFoundException("Type not found"));
+
         // Asignar el nombre del objeto en MinIO
         document.setObjectName(objectName);
+        document.setType(typeEntity);
 
         // Guardar el documento en la base de datos
         DocumentEntity savedDocument = documentRepository.save(document);

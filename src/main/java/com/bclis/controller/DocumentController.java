@@ -15,7 +15,6 @@ public class DocumentController {
     @Autowired
     private DocumentService documentService;
 
-
     @GetMapping("/test")
     public ResponseEntity<String> testEndpoint() {
         return ResponseEntity.ok("Test endpoint is working!");
