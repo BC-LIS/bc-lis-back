@@ -2,22 +2,32 @@ package com.bclis.controller;
 
 import com.bclis.dto.request.DocumentCreateDTO;
 import com.bclis.dto.response.DocumentResponseDTO;
+import com.bclis.service.DocumentFilterService;
 import com.bclis.service.DocumentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/documents")
+@RequiredArgsConstructor
 public class DocumentController {
 
-    @Autowired
-    private DocumentService documentService;
+    private final DocumentService documentService;
+    private final DocumentFilterService documentFilterService;
 
     @GetMapping("/test")
     public ResponseEntity<String> testEndpoint() {
         return ResponseEntity.ok("Test endpoint is working!");
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<DocumentResponseDTO>> findAllByFilters(@RequestParam Map<String, Object> filters) {
+        List<DocumentResponseDTO> documents = documentFilterService.findAllByFilters(filters);
+        return ResponseEntity.ok(documents);
     }
 
     // Endpoint para crear un nuevo documento
