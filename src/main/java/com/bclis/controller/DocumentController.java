@@ -19,10 +19,6 @@ public class DocumentController {
     private final DocumentService documentService;
     private final DocumentFilterService documentFilterService;
 
-    @GetMapping("/test")
-    public ResponseEntity<String> testEndpoint() {
-        return ResponseEntity.ok("Test endpoint is working!");
-    }
 
     @GetMapping("/filter")
     public ResponseEntity<List<DocumentResponseDTO>> findAllByFilters(@RequestParam Map<String, Object> filters) {
