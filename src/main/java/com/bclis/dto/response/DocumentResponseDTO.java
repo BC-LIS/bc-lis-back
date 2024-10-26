@@ -20,6 +20,6 @@ public class DocumentResponseDTO {
     private DocumentEntity.DocumentState state;
     private TypeResponseDTO type;
     private UserResponseDTO user;
-    private List<CategoryResponseDTO> categories;
+    private List<String> categories;
 }
 
