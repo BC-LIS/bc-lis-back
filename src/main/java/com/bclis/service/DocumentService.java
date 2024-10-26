@@ -2,9 +2,11 @@ package com.bclis.service;
 
 import com.bclis.dto.request.DocumentCreateDTO;
 import com.bclis.dto.response.DocumentResponseDTO;
+import com.bclis.persistence.entity.DocumentCategoryEntity;
 import com.bclis.persistence.entity.DocumentEntity;
 import com.bclis.persistence.entity.TypeEntity;
 import com.bclis.persistence.entity.UserEntity;
+import com.bclis.persistence.repository.DocumentCategoryRepository;
 import com.bclis.persistence.repository.DocumentRepository;
 import com.bclis.persistence.repository.TypeRepository;
 import com.bclis.persistence.repository.UserRepository;
@@ -22,7 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -32,6 +36,7 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final TypeRepository typeRepository;
     private final UserRepository userRepository;
+    private final DocumentCategoryRepository documentCategoryRepository;
 
     private final DocumentCategoryService documentCategoryService;
 
@@ -84,12 +89,29 @@ public class DocumentService {
     }
 
     // Método para obtener información de un documento por ID
+
+
+
     public DocumentResponseDTO getDocumentById(Long id) {
         DocumentEntity document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Documento no encont    rado"));
+                .orElseThrow(() -> new RuntimeException("Documento no encontrado"));
 
-        return modelMapper.map(document, DocumentResponseDTO.class);
+        // Obtener las categorías relacionadas
+        List<DocumentCategoryEntity> documentCategories = documentCategoryRepository.findByDocument(document);
+
+        // Crear el DTO de respuesta
+        DocumentResponseDTO responseDTO = modelMapper.map(document, DocumentResponseDTO.class);
+
+        // Obtener y establecer los nombres de las categorías en la respuesta
+        List<String> categoryNames = documentCategories.stream()
+                .map(dc -> dc.getCategory().getName())
+                .collect(Collectors.toList());
+
+        responseDTO.setCategories(categoryNames); // Establecer la lista de nombres de categorías
+
+        return responseDTO;
     }
+
 
     // Método para descargar un documento por ID
     public ResponseEntity<byte[]> downloadDocument(Long id) throws Exception {
