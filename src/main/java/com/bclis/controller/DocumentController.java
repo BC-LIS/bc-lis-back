@@ -28,14 +28,11 @@ public class DocumentController {
 
     // Endpoint para crear un nuevo documento
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<DocumentResponseDTO> createDocument(@ModelAttribute DocumentCreateDTO documentDTO) {
-        try {
-            DocumentResponseDTO response = documentService.createDocument(documentDTO);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            // Manejo de errores
-            return ResponseEntity.badRequest().body(null); // O puedes lanzar una excepción personalizada
-        }
+    public ResponseEntity<DocumentResponseDTO> createDocument(@ModelAttribute DocumentCreateDTO documentDTO) throws Exception {
+
+        DocumentResponseDTO response = documentService.createDocument(documentDTO);
+        return ResponseEntity.ok(response);
+
     }
 
     // Endpoint para obtener información de un documento por ID
