@@ -112,6 +112,30 @@ public class DocumentService {
         return responseDTO;
     }
 
+    public List<DocumentResponseDTO> getAllDocuments() {
+        List<DocumentEntity> documents = documentRepository.findAll(); // Obtener todos los documentos
+
+        // Mapeo de entidades a DTOs
+        return documents.stream()
+                .map(document -> {
+                    // Obtener las categorías relacionadas
+                    List<DocumentCategoryEntity> documentCategories = documentCategoryRepository.findByDocument(document);
+
+                    // Crear el DTO de respuesta
+                    DocumentResponseDTO responseDTO = modelMapper.map(document, DocumentResponseDTO.class);
+
+                    // Obtener y establecer los nombres de las categorías en la respuesta
+                    List<String> categoryNames = documentCategories.stream()
+                            .map(dc -> dc.getCategory().getName())
+                            .collect(Collectors.toList());
+
+                    responseDTO.setCategories(categoryNames); // Establecer la lista de nombres de categorías
+                    return responseDTO;
+                })
+                .collect(Collectors.toList());
+    }
+
+
 
     // Método para descargar un documento por ID
     public ResponseEntity<byte[]> downloadDocument(Long id) throws Exception {
