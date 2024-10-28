@@ -44,6 +44,13 @@ public class DocumentController {
 
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<DocumentResponseDTO>> getAllDocuments() {
+        List<DocumentResponseDTO> response = documentService.getAllDocuments();
+        return ResponseEntity.ok(response);
+    }
+
+
     // Endpoint para descargar un documento por ID
     @GetMapping("/{id}/download")
     public ResponseEntity<byte[]> downloadDocument(@PathVariable Long id) throws Exception {
