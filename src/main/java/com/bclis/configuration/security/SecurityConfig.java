@@ -1,6 +1,6 @@
-package com.bclis.security;
+package com.bclis.configuration.security;
 
-import com.bclis.security.filters.JwtAuthorizationFilter;
+import com.bclis.configuration.security.filters.JwtAuthorizationFilter;
 import com.bclis.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

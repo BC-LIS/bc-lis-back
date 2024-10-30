@@ -1,4 +1,4 @@
-package com.bclis.security.filters;
+package com.bclis.configuration.security.filters;
 
 import com.bclis.utils.jwt.JwtUtils;
 import jakarta.servlet.FilterChain;
