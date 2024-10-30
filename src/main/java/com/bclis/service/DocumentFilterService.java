@@ -4,6 +4,7 @@ import com.bclis.dto.response.DocumentResponseDTO;
 import com.bclis.persistence.entity.DocumentEntity;
 import com.bclis.persistence.repository.DocumentRepository;
 import com.bclis.persistence.specification.DocumentSpecification;
+import com.bclis.utils.exceptions.InvalidAttributeException;
 import com.bclis.utils.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -29,7 +30,15 @@ public class DocumentFilterService {
             String filter = entry.getKey();
             Object value = entry.getValue();
 
-            if (filter.equalsIgnoreCase("description")) {
+            if (filter.equalsIgnoreCase("name")) {
+                specification = specification
+                        .and(documentSpecification.hasAttribute(filter, value));
+            }
+            else if (filter.equalsIgnoreCase("state")){
+                specification = specification
+                        .and(documentSpecification.hasAttribute(filter, value));
+            }
+            else if (filter.equalsIgnoreCase("description")) {
                 specification = specification
                         .and(documentSpecification.containsAttribute(filter, value));
             }
@@ -42,15 +51,8 @@ public class DocumentFilterService {
                         .and(documentSpecification.hasAttribute("username", value, "user"));
             }
             else if (filter.equalsIgnoreCase("categories")) {
-                List<String> categories = List.of(
-                        value.toString()
-                        .replace(", ", ",")
-                        .split(","));
-
-                for (String category : categories) {
-                    specification = specification
-                            .or(documentSpecification.hasAttribute("name", category, "categories"));
-                }
+                specification = specification
+                        .and(this.getDocumentsByCategories(value));
             }
             else if (filter.equalsIgnoreCase("createdBefore")) {
                 specification = specification
@@ -68,9 +70,8 @@ public class DocumentFilterService {
                 specification = specification
                         .and(documentSpecification.dateAfter("updatedAt", value));
             }
-            else if (value instanceof String) {
-                specification = specification
-                        .and(documentSpecification.hasAttribute(filter, value));
+            else {
+                throw new InvalidAttributeException("Could not resolve attribute '"+filter+"'");
             }
         }
 
@@ -79,6 +80,22 @@ public class DocumentFilterService {
         return documentEntities.stream()
                 .map(document -> modelMapper.map(document, DocumentResponseDTO.class))
                 .toList();
+    }
+
+    public Specification<DocumentEntity> getDocumentsByCategories(Object value) {
+        Specification<DocumentEntity> specification = Specification.where(null);
+
+        List<String> categories = List.of(value
+                .toString()
+                .replace(", ", ",")
+                .split(","));
+
+        for (String category : categories) {
+            specification = specification
+                    .or(documentSpecification.hasAttribute("name", category, "categories"));
+        }
+
+        return specification;
     }
 
     public Specification<DocumentEntity> getDocumentsByType() {
