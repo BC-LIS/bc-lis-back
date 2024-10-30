@@ -4,6 +4,7 @@ import com.bclis.dto.response.DocumentResponseDTO;
 import com.bclis.persistence.entity.DocumentEntity;
 import com.bclis.persistence.repository.DocumentRepository;
 import com.bclis.persistence.specification.DocumentSpecification;
+import com.bclis.utils.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,11 +19,14 @@ import java.util.Map;
 public class DocumentFilterService {
 
     private final DocumentRepository documentRepository;
+    private final JwtUtils jwtUtils;
     private final DocumentSpecification documentSpecification;
     public final ModelMapper modelMapper;
 
     public List<DocumentResponseDTO> findAllByFilters(Map<String, Object> filters) {
-        Specification<DocumentEntity> specification = Specification.where(null);
+//        Specification<DocumentEntity> specification = Specification.where(null);
+
+        Specification<DocumentEntity> specification = this.getDocumentsByType();
 
         for (Map.Entry<String, Object> entry : filters.entrySet()) {
             String filter = entry.getKey();
@@ -66,5 +70,21 @@ public class DocumentFilterService {
         }
 
         return documentsResponse;
+    }
+
+    public Specification<DocumentEntity> getDocumentsByType() {
+        Specification<DocumentEntity> specification = Specification.where(null);
+        List<String> authorities = jwtUtils.getAutoritiesFromToken();
+
+        if (authorities.contains("ROLE_TECHNICAL")) {
+            specification = specification
+                    .and(documentSpecification.hasAttributeNotEqual("name", "Administrative", "type"));
+        }
+        else if (authorities.contains("ROLE_GENERIC")) {
+            specification = specification
+                    .and(documentSpecification.hasAttributeNotEqual("name", "Programming", "type"));
+        }
+
+        return specification;
     }
 }
