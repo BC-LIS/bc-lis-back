@@ -54,6 +54,10 @@ public class DocumentFilterService {
                             .or(documentSpecification.hasAttribute("name", category, "categories"));
                 }
             }
+            else if (filter.equalsIgnoreCase("createdBefore")) {
+                specification = specification
+                        .and(documentSpecification.dateBefore("createdAt", value));
+            }
             else if (value instanceof String) {
                 specification = specification
                         .and(documentSpecification.hasAttribute(filter, value));
