@@ -29,16 +29,31 @@ public class DocumentFilterService {
             Object value = entry.getValue();
 
             if (filter.equalsIgnoreCase("description")) {
-                specification = specification.and(documentSpecification.containsAttribute(filter, value));
+                specification = specification
+                        .and(documentSpecification.containsAttribute(filter, value));
             }
             else if (filter.equalsIgnoreCase("typeName")) {
-                specification = specification.and(documentSpecification.hasRelatedAttribute("name", value, "type"));
+                specification = specification
+                        .and(documentSpecification.hasAttribute("name", value, "type"));
             }
             else if (filter.equalsIgnoreCase("username")) {
-                specification = specification.and(documentSpecification.hasRelatedAttribute("username", value, "users"));
+                specification = specification
+                        .and(documentSpecification.hasAttribute("username", value, "user"));
+            }
+            else if (filter.equalsIgnoreCase("categories")) {
+                List<String> categories = List.of(
+                        value.toString()
+                        .replace(", ", ",")
+                        .split(","));
+
+                for (String category : categories) {
+                    specification = specification
+                            .or(documentSpecification.hasAttribute("name", category, "categories"));
+                }
             }
             else if (value instanceof String) {
-                specification = specification.and(documentSpecification.hasAttribute(filter, value));
+                specification = specification
+                        .and(documentSpecification.hasAttribute(filter, value));
             }
         }
 
