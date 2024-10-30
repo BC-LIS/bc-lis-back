@@ -36,10 +36,17 @@ public class DocumentSpecification {
 
     public <T> Specification<T> dateBefore(String attributeName, Object value) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
         LocalDate date = LocalDate.parse(value.toString(), formatter);
 
         return (root, query, criteriaBuilder) -> criteriaBuilder
                 .lessThan(root.get(attributeName), date);
+    }
+
+    public <T> Specification<T> dateAfter(String attributeName, Object value) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(value.toString(), formatter);
+
+        return (root, query, criteriaBuilder) -> criteriaBuilder
+                .greaterThan(root.get(attributeName), date);
     }
 }

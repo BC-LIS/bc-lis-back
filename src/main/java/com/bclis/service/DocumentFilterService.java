@@ -10,10 +10,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +55,18 @@ public class DocumentFilterService {
             else if (filter.equalsIgnoreCase("createdBefore")) {
                 specification = specification
                         .and(documentSpecification.dateBefore("createdAt", value));
+            }
+            else if (filter.equalsIgnoreCase("updatedBefore")) {
+                specification = specification
+                        .and(documentSpecification.dateBefore("updatedAt", value));
+            }
+            else if (filter.equalsIgnoreCase("createdAfter")) {
+                specification = specification
+                        .and(documentSpecification.dateAfter("createdAt", value));
+            }
+            else if (filter.equalsIgnoreCase("updatedAfter")) {
+                specification = specification
+                        .and(documentSpecification.dateAfter("updatedAt", value));
             }
             else if (value instanceof String) {
                 specification = specification
