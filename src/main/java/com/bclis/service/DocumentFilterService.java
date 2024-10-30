@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +25,6 @@ public class DocumentFilterService {
     public final ModelMapper modelMapper;
 
     public List<DocumentResponseDTO> findAllByFilters(Map<String, Object> filters) {
-//        Specification<DocumentEntity> specification = Specification.where(null);
-
         Specification<DocumentEntity> specification = this.getDocumentsByType();
 
         for (Map.Entry<String, Object> entry : filters.entrySet()) {
@@ -62,14 +61,10 @@ public class DocumentFilterService {
         }
 
         List<DocumentEntity> documentEntities = documentRepository.findAll(specification);
-        List<DocumentResponseDTO> documentsResponse = new ArrayList<>();
 
-        for (DocumentEntity documentEntity : documentEntities) {
-            DocumentResponseDTO documentResponseDTO = modelMapper.map(documentEntity, DocumentResponseDTO.class);
-            documentsResponse.add(documentResponseDTO);
-        }
-
-        return documentsResponse;
+        return documentEntities.stream()
+                .map(document -> modelMapper.map(document, DocumentResponseDTO.class))
+                .toList();
     }
 
     public Specification<DocumentEntity> getDocumentsByType() {
