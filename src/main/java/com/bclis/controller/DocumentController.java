@@ -21,7 +21,7 @@ public class DocumentController {
 
 
     @GetMapping("/filter")
-    public ResponseEntity<List<DocumentResponseDTO>> findAllByFilters(@RequestParam Map<String, Object> filters) {
+    public ResponseEntity<List<DocumentResponseDTO>> findAllByFilters(@RequestParam Map<String, String> filters) {
         List<DocumentResponseDTO> documents = documentFilterService.findAllByFilters(filters);
         return ResponseEntity.ok(documents);
     }

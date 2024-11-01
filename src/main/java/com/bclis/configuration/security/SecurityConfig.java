@@ -1,6 +1,6 @@
-package com.bclis.security;
+package com.bclis.configuration.security;
 
-import com.bclis.security.filters.JwtAuthorizationFilter;
+import com.bclis.configuration.security.filters.JwtAuthorizationFilter;
 import com.bclis.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -33,10 +33,10 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/auth/login").permitAll();
                     auth.requestMatchers("/v1/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
+                    auth.requestMatchers("/categories/**", "/types/**").permitAll();
+                    auth.requestMatchers("/auth/login").permitAll();
                     auth.requestMatchers("/auth/register").hasRole("ADMIN");
-                    auth.requestMatchers("/categories/**", "/types/**").hasAnyRole("ADMIN", "TECHNICAL");
 //                    auth.requestMatchers("/**").permitAll();
                     auth.anyRequest().authenticated();
                 })

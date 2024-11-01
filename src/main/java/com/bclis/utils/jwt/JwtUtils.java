@@ -9,10 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -56,7 +58,7 @@ public class JwtUtils {
                     .parseClaimsJws(token)
                     .getBody();
             return true;
-        } catch(Exception exception){
+        } catch (Exception exception) {
             log.error("Invalid JWT, error: ", exception);
             return false;
         }
@@ -82,6 +84,19 @@ public class JwtUtils {
 
     public String getUsernameFromToken(String token) {
         return getClaim(token, Claims::getSubject);
+    }
+
+    public List<String> getAutoritiesFromToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            return authentication.getAuthorities()
+                    .stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
+        }
+
+        return List.of();
     }
 
 }

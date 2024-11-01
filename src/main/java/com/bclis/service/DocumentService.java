@@ -15,6 +15,7 @@ import io.minio.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final TypeRepository typeRepository;
     private final UserRepository userRepository;
-    private final DocumentCategoryRepository documentCategoryRepository;
+    private final DocumentFilterService documentFilterService;
 
     private final DocumentCategoryService documentCategoryService;
 
@@ -96,46 +97,30 @@ public class DocumentService {
         DocumentEntity document = documentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Documento no encontrado"));
 
-        // Obtener las categorías relacionadas
-        List<DocumentCategoryEntity> documentCategories = documentCategoryRepository.findByDocument(document);
+//        // Obtener las categorías relacionadas
+//        List<DocumentCategoryEntity> documentCategories = documentCategoryRepository.findByDocument(document);
 
         // Crear el DTO de respuesta
         DocumentResponseDTO responseDTO = modelMapper.map(document, DocumentResponseDTO.class);
-
-        // Obtener y establecer los nombres de las categorías en la respuesta
-        List<String> categoryNames = documentCategories.stream()
-                .map(dc -> dc.getCategory().getName())
-                .collect(Collectors.toList());
-
-        responseDTO.setCategories(categoryNames); // Establecer la lista de nombres de categorías
+//
+//        // Obtener y establecer los nombres de las categorías en la respuesta
+//        List<String> categoryNames = documentCategories.stream()
+//                .map(dc -> dc.getCategory().getName())
+//                .collect(Collectors.toList());
+//
+//        responseDTO.setCategories(categoryNames); // Establecer la lista de nombres de categorías
 
         return responseDTO;
     }
 
     public List<DocumentResponseDTO> getAllDocuments() {
-        List<DocumentEntity> documents = documentRepository.findAll(); // Obtener todos los documentos
+        Specification<DocumentEntity> specification = documentFilterService.getDocumentsByType();
+        List<DocumentEntity> documents = documentRepository.findAll(specification);
 
-        // Mapeo de entidades a DTOs
         return documents.stream()
-                .map(document -> {
-                    // Obtener las categorías relacionadas
-                    List<DocumentCategoryEntity> documentCategories = documentCategoryRepository.findByDocument(document);
-
-                    // Crear el DTO de respuesta
-                    DocumentResponseDTO responseDTO = modelMapper.map(document, DocumentResponseDTO.class);
-
-                    // Obtener y establecer los nombres de las categorías en la respuesta
-                    List<String> categoryNames = documentCategories.stream()
-                            .map(dc -> dc.getCategory().getName())
-                            .collect(Collectors.toList());
-
-                    responseDTO.setCategories(categoryNames); // Establecer la lista de nombres de categorías
-                    return responseDTO;
-                })
-                .collect(Collectors.toList());
+                .map(document -> modelMapper.map(document, DocumentResponseDTO.class))
+                .toList();
     }
-
-
 
     // Método para descargar un documento por ID
     public ResponseEntity<byte[]> downloadDocument(Long id) throws Exception {

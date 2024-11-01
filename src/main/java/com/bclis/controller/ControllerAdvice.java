@@ -2,6 +2,7 @@ package com.bclis.controller;
 
 import com.bclis.dto.response.ErrorResponseDTO;
 import com.bclis.utils.exceptions.AlreadyExistsException;
+import com.bclis.utils.exceptions.InvalidAttributeException;
 import com.bclis.utils.exceptions.NotFoundException;
 import com.bclis.utils.exceptions.DependentResourceException;
 import org.springframework.http.HttpStatus;
@@ -57,5 +58,14 @@ public class ControllerAdvice {
                 .message(ex.getMessage())
                 .build();
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = InvalidAttributeException.class)
+    public ResponseEntity<ErrorResponseDTO> requestExceptionHandler(InvalidAttributeException ex){
+        ErrorResponseDTO error = ErrorResponseDTO.builder()
+                .code("400")
+                .message(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

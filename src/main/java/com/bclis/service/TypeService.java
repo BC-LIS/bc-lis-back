@@ -7,6 +7,7 @@ import com.bclis.persistence.repository.TypeRepository;
 import com.bclis.utils.exceptions.AlreadyExistsException;
 import com.bclis.utils.exceptions.DependentResourceException;
 import com.bclis.utils.exceptions.NotFoundException;
+import com.bclis.utils.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +20,22 @@ public class TypeService {
 
     private final TypeRepository typeRepository;
     private final DocumentRepository documentRepository;
+    public final JwtUtils jwtUtils;
 
     public List<String> getAllTypes() {
-        List<TypeEntity> typeEntities = typeRepository.findAll();
+        List<String> authorities = jwtUtils.getAutoritiesFromToken();
+        List<TypeEntity> typeEntities;
+
+        if (authorities.contains("ROLE_TECHNICAL")) {
+            typeEntities = typeRepository.findByNameNot("Administrative");
+        }
+        else if (authorities.contains("ROLE_GENERIC")) {
+            typeEntities = typeRepository.findByNameNot("Programming");
+        }
+        else {
+            typeEntities = typeRepository.findAll();
+        }
+
         List<String> types = new ArrayList<>();
         typeEntities.forEach(t -> types.add(t.getName()));
         return types;
@@ -44,9 +58,9 @@ public class TypeService {
         TypeEntity typeEntity = typeRepository.findByName(typeDTO.getTypeName())
                 .orElseThrow(() -> new NotFoundException("Type not found"));
 
-        boolean existsTypeDependecies = documentRepository.existsByTypeId(typeEntity.getId());
+        boolean existsTypeDependencies = documentRepository.existsByTypeId(typeEntity.getId());
 
-        if (existsTypeDependecies) {
+        if (existsTypeDependencies) {
             throw new DependentResourceException("There are dependencies for this type that prevent this action");
         }
 
