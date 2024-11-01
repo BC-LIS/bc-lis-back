@@ -23,12 +23,12 @@ public class DocumentFilterService {
     private final DocumentSpecification documentSpecification;
     public final ModelMapper modelMapper;
 
-    public List<DocumentResponseDTO> findAllByFilters(Map<String, Object> filters) {
+    public List<DocumentResponseDTO> findAllByFilters(Map<String, String> filters) {
         Specification<DocumentEntity> specification = this.getDocumentsByType();
 
-        for (Map.Entry<String, Object> entry : filters.entrySet()) {
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
             String filter = entry.getKey();
-            Object value = entry.getValue();
+            String value = entry.getValue();
 
             if (filter.equalsIgnoreCase("name")) {
                 specification = specification
