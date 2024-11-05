@@ -40,7 +40,7 @@ public class CommentEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
-    private CommentState state = CommentState.VISIBLE;
+    private CommentState state;
 
     public enum CommentState {
         VISIBLE,
