@@ -2,6 +2,7 @@ package com.bclis.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Entity
+@Builder
 @Table(name = "comment")
 public class CommentEntity {
 
@@ -38,7 +40,7 @@ public class CommentEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
-    private CommentState state;
+    private CommentState state = CommentState.VISIBLE;
 
     public enum CommentState {
         VISIBLE,
