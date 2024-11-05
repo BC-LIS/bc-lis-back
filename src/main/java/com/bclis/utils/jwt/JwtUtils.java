@@ -86,7 +86,15 @@ public class JwtUtils {
         return getClaim(token, Claims::getSubject);
     }
 
-    public List<String> getAutoritiesFromToken() {
+    public String getUsernameFromSecurityContext() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()){
+            return authentication.getPrincipal().toString();
+        }
+        return "";
+    }
+
+    public List<String> getAutoritiesSecurityContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
