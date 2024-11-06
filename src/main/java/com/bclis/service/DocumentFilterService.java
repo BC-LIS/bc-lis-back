@@ -100,7 +100,7 @@ public class DocumentFilterService {
 
     public Specification<DocumentEntity> getDocumentsByType() {
         Specification<DocumentEntity> specification = Specification.where(null);
-        List<String> authorities = jwtUtils.getAutoritiesFromToken();
+        List<String> authorities = jwtUtils.getAuthoritiesSecurityContext();
 
         if (authorities.contains("ROLE_TECHNICAL")) {
             specification = specification

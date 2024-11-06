@@ -1,10 +1,7 @@
 package com.bclis.controller;
 
 import com.bclis.dto.response.ErrorResponseDTO;
-import com.bclis.utils.exceptions.AlreadyExistsException;
-import com.bclis.utils.exceptions.InvalidAttributeException;
-import com.bclis.utils.exceptions.NotFoundException;
-import com.bclis.utils.exceptions.DependentResourceException;
+import com.bclis.utils.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -67,5 +64,14 @@ public class ControllerAdvice {
                 .message(ex.getMessage())
                 .build();
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = UnauthorizedModificationException.class)
+    public ResponseEntity<ErrorResponseDTO> requestExceptionHandler(UnauthorizedModificationException ex){
+        ErrorResponseDTO error = ErrorResponseDTO.builder()
+                .code("403")
+                .message(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 }
