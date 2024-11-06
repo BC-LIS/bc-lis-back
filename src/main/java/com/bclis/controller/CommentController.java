@@ -41,4 +41,10 @@ public class CommentController {
         CommentResponseDTO commentResponseDTO = commentService.updateCommentContent(commentContentUpdateDTO);
         return ResponseEntity.ok(commentResponseDTO);
     }
+
+    @DeleteMapping
+    public ResponseEntity<CommentResponseDTO> deleteComment(@RequestParam Long commentId) {
+        CommentResponseDTO commentResponseDTO = commentService.deleteComment(commentId);
+        return ResponseEntity.ok(commentResponseDTO);
+    }
 }

@@ -18,7 +18,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -61,7 +60,7 @@ public class CommentService {
 
     public CommentResponseDTO updateCommentState(CommentStateUpdateDTO commentStateUpdateDTO){
         CommentEntity commentEntity = commentRepository.findById(commentStateUpdateDTO.getId())
-                .orElseThrow(() -> new NotFoundException("Comment not found"));;
+                .orElseThrow(() -> new NotFoundException("Comment not found"));
 
         commentEntity.setState(commentStateUpdateDTO.getCommentState());
         commentRepository.save(commentEntity);
@@ -82,6 +81,23 @@ public class CommentService {
 
         commentEntity.setContent(commentContentUpdateDTO.getContent());
         commentRepository.save(commentEntity);
+
+        return modelMapper.map(commentEntity, CommentResponseDTO.class);
+    }
+
+    public CommentResponseDTO deleteComment(Long commentId) {
+        CommentEntity commentEntity = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("Comment not found"));
+
+        String author = commentEntity.getUser().getUsername();
+        String authenticatedUser = jwtUtils.getUsernameFromSecurityContext();
+        List<String> authorities = jwtUtils.getAuthoritiesSecurityContext();
+
+        if (!author.equalsIgnoreCase(authenticatedUser) && !authorities.contains("ROLE_ADMIN")) {
+            throw new UnauthorizedModificationException("User not authorized to delete comment");
+        }
+
+        commentRepository.delete(commentEntity);
 
         return modelMapper.map(commentEntity, CommentResponseDTO.class);
     }

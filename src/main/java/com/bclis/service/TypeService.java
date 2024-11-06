@@ -23,7 +23,7 @@ public class TypeService {
     public final JwtUtils jwtUtils;
 
     public List<String> getAllTypes() {
-        List<String> authorities = jwtUtils.getAutoritiesSecurityContext();
+        List<String> authorities = jwtUtils.getAuthoritiesSecurityContext();
         List<TypeEntity> typeEntities;
 
         if (authorities.contains("ROLE_TECHNICAL")) {
