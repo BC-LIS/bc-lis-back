@@ -94,7 +94,7 @@ public class JwtUtils {
         return "";
     }
 
-    public List<String> getAutoritiesSecurityContext() {
+    public List<String> getAuthoritiesSecurityContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
