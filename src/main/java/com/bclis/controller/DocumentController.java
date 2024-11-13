@@ -26,7 +26,6 @@ public class DocumentController {
         return ResponseEntity.ok(documents);
     }
 
-    // Endpoint para crear un nuevo documento
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<DocumentResponseDTO> createDocument(@ModelAttribute DocumentCreateDTO documentDTO) throws Exception {
 
@@ -35,7 +34,6 @@ public class DocumentController {
 
     }
 
-    // Endpoint para obtener información de un documento por ID
     @GetMapping("/{id}")
     public ResponseEntity<DocumentResponseDTO> getDocumentById(@PathVariable Long id) {
 
@@ -51,7 +49,6 @@ public class DocumentController {
     }
 
 
-    // Endpoint para descargar un documento por ID
     @GetMapping("/{id}/download")
     public ResponseEntity<byte[]> downloadDocument(@PathVariable Long id) throws Exception {
         return documentService.downloadDocument(id);
