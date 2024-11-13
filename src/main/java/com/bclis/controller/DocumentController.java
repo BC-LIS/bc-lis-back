@@ -58,11 +58,4 @@ public class DocumentController {
 
     }
 
-    // Endpoint para obtener información del documento y descargar el archivo en una sola petición
-    @GetMapping("/{id}/info-and-download")
-    public ResponseEntity<byte[]> getDocumentWithInfo(@PathVariable Long id) throws Exception {
-
-        return documentService.getDocumentWithInfo(id);
-
-    }
 }
