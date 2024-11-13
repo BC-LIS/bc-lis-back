@@ -165,44 +165,6 @@ public class DocumentService {
 
 
 
-    // Método para obtener información del documento y descargar el archivo en una sola llamada
-    public ResponseEntity<byte[]> getDocumentWithInfo(Long id) throws Exception {
-        // Obtener la información del documento de la base de datos
-        DocumentEntity document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Documento no encontrado"));
 
-        // Obtener el archivo desde MinIO usando el objectName
-        InputStream stream = minioClient.getObject(
-                GetObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(document.getObjectName())
-                        .build()
-        );
-
-        // Leer el archivo como un array de bytes
-        byte[] fileBytes = stream.readAllBytes();
-        stream.close();
-
-        // Obtener los metadatos del archivo en MinIO
-        StatObjectResponse stat = minioClient.statObject(
-                StatObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(document.getObjectName())
-                        .build()
-        );
-
-        // Agregar los metadatos del documento en los headers de la respuesta
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType(stat.contentType()));
-        headers.setContentDispositionFormData("attachment", document.getObjectName());
-        headers.add("Document-Id", document.getId().toString());
-        headers.add("Document-Name", document.getName());
-        headers.add("Document-Description", document.getDescription());
-
-        // Devolver la respuesta con los metadatos en los headers y el archivo en el cuerpo
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(fileBytes);
-    }
 
 }
