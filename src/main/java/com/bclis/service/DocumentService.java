@@ -2,14 +2,8 @@ package com.bclis.service;
 
 import com.bclis.dto.request.DocumentCreateDTO;
 import com.bclis.dto.response.DocumentResponseDTO;
-import com.bclis.persistence.entity.DocumentCategoryEntity;
-import com.bclis.persistence.entity.DocumentEntity;
-import com.bclis.persistence.entity.TypeEntity;
-import com.bclis.persistence.entity.UserEntity;
-import com.bclis.persistence.repository.DocumentCategoryRepository;
-import com.bclis.persistence.repository.DocumentRepository;
-import com.bclis.persistence.repository.TypeRepository;
-import com.bclis.persistence.repository.UserRepository;
+import com.bclis.persistence.entity.*;
+import com.bclis.persistence.repository.*;
 import com.bclis.utils.exceptions.NotFoundException;
 import io.minio.*;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +31,7 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final TypeRepository typeRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final DocumentFilterService documentFilterService;
 
     private final DocumentCategoryService documentCategoryService;
@@ -75,40 +70,32 @@ public class DocumentService {
         UserEntity userEntity = userRepository.findByUsername(documentDTO.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
 
+        List<CategoryEntity> categoriesEntity = documentDTO.getCategories()
+                .stream()
+                .map(categoryString -> categoryRepository.findByName(categoryString)
+                        .orElseThrow(() -> new NotFoundException("Category not found")))
+                .toList();
+
         // Asignar el nombre del objeto en MinIO
         document.setObjectName(objectName);
         document.setType(typeEntity);
         document.setUser(userEntity);
+        document.setCategories(categoriesEntity);
 
         // Guardar el documento en la base de datos
         DocumentEntity savedDocument = documentRepository.save(document);
-
-        documentCategoryService.createDocumentCategoryService(documentDTO.getCategories(), document);
 
         // Convertir la entidad guardada en DocumentResponseDTO usando ModelMapper
         return modelMapper.map(savedDocument, DocumentResponseDTO.class);
     }
 
     // Método para obtener información de un documento por ID
-
-
-
     public DocumentResponseDTO getDocumentById(Long id) {
         DocumentEntity document = documentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Documento no encontrado"));
 
-//        // Obtener las categorías relacionadas
-//        List<DocumentCategoryEntity> documentCategories = documentCategoryRepository.findByDocument(document);
-
         // Crear el DTO de respuesta
         DocumentResponseDTO responseDTO = modelMapper.map(document, DocumentResponseDTO.class);
-//
-//        // Obtener y establecer los nombres de las categorías en la respuesta
-//        List<String> categoryNames = documentCategories.stream()
-//                .map(dc -> dc.getCategory().getName())
-//                .collect(Collectors.toList());
-//
-//        responseDTO.setCategories(categoryNames); // Establecer la lista de nombres de categorías
 
         return responseDTO;
     }
