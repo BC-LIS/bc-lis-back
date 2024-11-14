@@ -34,8 +34,6 @@ public class DocumentService {
     private final CategoryRepository categoryRepository;
     private final DocumentFilterService documentFilterService;
 
-    private final DocumentCategoryService documentCategoryService;
-
     private final MinioClient minioClient;
     private final ModelMapper modelMapper;
 
