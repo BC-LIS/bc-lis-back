@@ -148,6 +148,25 @@ public class DocumentService {
                 .body(fileBytes);
     }
 
+    // Método para eliminar un documento por ID
+    public void deleteDocument(Long id) throws Exception {
+        // Obtener el documento desde la base de datos
+        DocumentEntity document = documentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Documento no encontrado"));
+
+        // Eliminar el archivo de MinIO
+        minioClient.removeObject(
+                RemoveObjectArgs.builder()
+                        .bucket(bucketName)
+                        .object(document.getObjectName())
+                        .build()
+        );
+
+        // Eliminar el documento de la base de datos
+        documentRepository.delete(document);
+    }
+
+
 
 
 
