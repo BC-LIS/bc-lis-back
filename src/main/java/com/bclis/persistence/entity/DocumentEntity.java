@@ -64,7 +64,13 @@ public class DocumentEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "document_category", joinColumns = @JoinColumn(name = "document_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "document_category",
+            joinColumns = @JoinColumn(name = "document_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
     private List<CategoryEntity> categories;
+
 }
