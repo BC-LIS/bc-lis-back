@@ -24,6 +24,22 @@ public class ApiDescription {
             "\n"
             +"It can be accessed by all existing roles.";
 
+    //Type controller
+    public static final String TYPE_CONTROLLER_DESCRIPTION = "This controller manages the type that can exist for each document.";
+    public static final String GET_TYPE_DESCRIPTION = "Endpoint that allows retrieving all available types. \n"
+            + "\n"
+            +"It can be accessed by all existing roles.";
+
+    public static final String CREATE_TYPE_DESCRIPTION = "Endpoint that allows create a type of document. \n"
+            +"\n"
+            +"You must indicate the name of the type in the body of the request. \n"
+            +"\n"
+            +"It can be accessed by all existing roles.";
+
+    public static final String DELETE_TYPE_DESCRIPTION = "Endpoint that allows deleting a type by specifying its name \n" +
+            "\n"
+            +"It can be accessed by all existing roles.";
+
     // DocumentController
     public static final String DOCUMENT_CONTROLLER_DESCRIPTION = "This controller handles operations related to document management.";
     public static final String CREATE_DOCUMENT_DESCRIPTION = "Endpoint that allows the creation of new documents.";
