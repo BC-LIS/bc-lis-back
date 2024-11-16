@@ -40,6 +40,32 @@ public class ApiDescription {
             "\n"
             +"It can be accessed by all existing roles.";
 
+    //Comment controller
+    public static final String COMMENT_CONTROLLER_DESCRIPTION = "This controller manages the comments that can exist for each document.";
+    public static final String CREATE_COMMENT_DESCRIPTION = "Endpoint that allows creating comments on each document \n" +
+            "\n"
+            +"It is necessary to send the content of the comment and the document Id";
+    public static final String GET_COMMENT_DESCRIPTION = "Endpoint that allows retrieving a comment by documentId. \n"
+            + "\n"
+            +"It can be accessed by all existing roles.";
+    public static final String UPDATE_COMMENT_STATE_DESCRIPTION = "Endpoint that allows updating the document status. \n"
+            + "\n"
+            +"It is necessary to send the document Id and the new status of the comment. \n" +
+            "\n"
+            +"The available states are: VISIBLE and HIDDEN. \n" +
+            "\n"
+            +"It can be accessed by all existing roles.";
+
+    public static final String UPDATE_COMMENT_CONTENT_DESCRIPTION = "Endpoint that allows updating the document content. \n"
+            + "\n"
+            +"It is necessary to send the Id and the new content of the comment. \n" +
+            "\n"
+            +"It can be accessed by all existing roles.";
+
+    public static final String DELETE_COMMENT_DESCRIPTION = "Endpoint that allows deleting a comment by specifying its id \n" +
+            "\n"
+            +"It can be accessed by all existing roles.";
+
     // DocumentController
     public static final String DOCUMENT_CONTROLLER_DESCRIPTION = "This controller handles operations related to document management.";
     public static final String CREATE_DOCUMENT_DESCRIPTION = "Endpoint that allows the creation of new documents.";
