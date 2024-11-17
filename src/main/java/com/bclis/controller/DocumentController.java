@@ -1,9 +1,11 @@
 package com.bclis.controller;
 
 import com.bclis.dto.request.DocumentCreateDTO;
+import com.bclis.dto.request.DocumentUpdateDTO;
 import com.bclis.dto.response.DocumentResponseDTO;
 import com.bclis.service.DocumentFilterService;
 import com.bclis.service.DocumentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,6 +62,14 @@ public class DocumentController {
         documentService.deleteDocument(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/documents/{documentId}")
+    public ResponseEntity<DocumentResponseDTO> updateDocument(@PathVariable Long documentId, @RequestBody @Valid DocumentUpdateDTO documentUpdateDTO) throws Exception {
+
+        DocumentResponseDTO updatedDocument = documentService.updateDocument(documentId, documentUpdateDTO);
+        return ResponseEntity.ok(updatedDocument);
+    }
+
 
 
 }
