@@ -62,15 +62,35 @@ public class ApiDescription {
             "\n"
             +"It can be accessed by all existing roles.";
 
-    public static final String DELETE_COMMENT_DESCRIPTION = "Endpoint that allows deleting a comment by specifying its id \n" +
+    public static final String DELETE_COMMENT_DESCRIPTION = "Endpoint that allows deleting a comment by specifying its id. \n" +
             "\n"
             +"It can be accessed by all existing roles.";
 
-    // DocumentController
+    // Document Controller
     public static final String DOCUMENT_CONTROLLER_DESCRIPTION = "This controller handles operations related to document management.";
-    public static final String CREATE_DOCUMENT_DESCRIPTION = "Endpoint that allows the creation of new documents.";
-    public static final String GET_DOCUMENT_DESCRIPTION = "Endpoint that allows you to obtain a specific document by its ID.";
-    public static final String GET_ALL_DOCUMENT_DESCRIPTION = "Endpoint that allows you to obtain all documents.";
-    public static final String UPDATE_DOCUMENT_DESCRIPTION = "Endpoint that allows updating a specific document by its ID.";
+    public static final String CREATE_DOCUMENT_DESCRIPTION = "Endpoint that allows the creation of new documents. \n"
+            +"\n"
+            +"In the body of the request, you must indicate: name, description, attach document, document status, document type, creator user, and associated category. \n"
+            +"\n"
+            +"It can be accessed by all existing roles.";
+    public static final String GET_DOCUMENT_DESCRIPTION = "Endpoint that allows you to obtain a specific document by its Id. \n" +
+            "\n"
+            +"It can be accessed by all existing roles.";
+    public static final String GET_ALL_DOCUMENT_DESCRIPTION = "Endpoint that allows you to obtain all documents. \n" +
+            "\n"
+            +"It can be accessed by all existing roles.";
+    public static final String GET_DOCUMENT_BY_FILTER_DESCRIPTION = "Endpoint that allows me to obtain the documents according to the specified filters. \n"
+            +"\n"
+            +"The available filters with their respective format are: \n"
+            +"\n"
+            +"\"name\": \"value\", \"description\": \"value\", \"state\": \"value\", \"username\": \"value\",\n" +
+            "\"typeName\": \"value\",  \"categories\": \"value1,value2,value3, ...\"\n" +
+            "\"createdBefore\": \"yyyy-MM-dd\", \"updatedBefore\": \"yyyy-MM-dd\", \"createdAfter\": \"yyyy-MM-dd\", \"updatedAfter\": \"yyyy-MM-dd\" \n"
+            +"\n"
+            +"It can be accessed by all existing roles.";
+    public static final String GET_DOCUMENT_TO_DOWNLOAD_DESCRIPTION = "Endpoint that allows you to obtain document by Id to download. \n" +
+            "\n"
+            +"It can be accessed by all existing roles.";
+    public static final String UPDATE_DOCUMENT_DESCRIPTION = "Endpoint that allows updating a specific document by its Id.";
     public static final String DELETE_DOCUMENT_DESCRIPTION = "Endpoint that allows you to delete a specific document by its ID.";
 }
