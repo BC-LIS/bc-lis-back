@@ -34,7 +34,7 @@ public class DocumentUpdateDTO {
     private DocumentState state;
 
     @Schema(description = "Updated categories associated with the document",
-            example = "[\"New Category\", \"Updated Project\"]",
+            example = "[\"New Category\", \"New Category\"]",
             type = "array")
     @Size(min = 1, message = "At least one category is required")
     private List<String> categories;
