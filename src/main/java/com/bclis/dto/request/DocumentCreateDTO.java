@@ -45,8 +45,9 @@ public class DocumentCreateDTO {
     private DocumentEntity.DocumentState state;
 
 
-    @Schema(description = "Type of the document (for example, Invoice, Report, etc.)",
-            example = "Report",
+    @Schema(description = "Type of the document (Programming, Administrative or Both)",
+            example = "Programming",
+
             type = "string",
             required = true,
             minLength = 3,

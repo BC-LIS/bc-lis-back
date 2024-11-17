@@ -1,9 +1,11 @@
 package com.bclis.controller;
 
 import com.bclis.dto.request.DocumentCreateDTO;
+import com.bclis.dto.request.DocumentUpdateDTO;
 import com.bclis.dto.response.DocumentResponseDTO;
 import com.bclis.service.DocumentFilterService;
 import com.bclis.service.DocumentService;
+import jakarta.validation.Valid;
 import com.bclis.utils.constans.ApiDescription;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -61,5 +63,20 @@ public class DocumentController {
         return documentService.downloadDocument(id);
 
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDocument(@PathVariable Long id) throws Exception {
+        documentService.deleteDocument(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/update/{documentId}")
+    public ResponseEntity<DocumentResponseDTO> updateDocument(@PathVariable Long documentId, @RequestBody @Valid DocumentUpdateDTO documentUpdateDTO) throws Exception {
+
+        DocumentResponseDTO updatedDocument = documentService.updateDocument(documentId, documentUpdateDTO);
+        return ResponseEntity.ok(updatedDocument);
+    }
+
+
 
 }

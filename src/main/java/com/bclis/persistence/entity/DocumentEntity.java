@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -64,7 +66,31 @@ public class DocumentEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "document_category", joinColumns = @JoinColumn(name = "document_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private List<CategoryEntity> categories;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(
+            name = "document_category",
+            joinColumns = @JoinColumn(name = "document_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<CategoryEntity> categories;
+
+    public void addCategory(CategoryEntity category) {
+        if (categories == null) {
+            categories = new HashSet<>();
+        }
+        if (!categories.contains(category)) {
+            categories.add(category);
+        }
+    }
+
+    public void removeCategory(CategoryEntity category) {
+        if (categories != null) {
+            categories.remove(category);
+        }
+    }
+
+
+
+
 }
