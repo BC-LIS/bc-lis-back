@@ -63,7 +63,7 @@ public class DocumentController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/documents/{documentId}")
+    @PutMapping("/update/{documentId}")
     public ResponseEntity<DocumentResponseDTO> updateDocument(@PathVariable Long documentId, @RequestBody @Valid DocumentUpdateDTO documentUpdateDTO) throws Exception {
 
         DocumentResponseDTO updatedDocument = documentService.updateDocument(documentId, documentUpdateDTO);
