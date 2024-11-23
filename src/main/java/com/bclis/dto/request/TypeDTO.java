@@ -12,7 +12,6 @@ public class TypeDTO {
     @Schema(description = "Name of the document type",
             example = "Report",
             type = "string",
-            required = true,
             minLength = 3,
             maxLength = 50)
     private String typeName;
