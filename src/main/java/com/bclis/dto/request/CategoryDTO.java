@@ -12,7 +12,6 @@ public class CategoryDTO {
     @Schema(description = "Name of the document category",
             example = "Finance",
             type = "string",
-            required = true,
             minLength = 3,
             maxLength = 50)
     private String categoryName;
