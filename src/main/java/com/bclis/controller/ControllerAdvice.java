@@ -66,6 +66,15 @@ public class ControllerAdvice {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = FileProcessingException.class)
+    public ResponseEntity<ErrorResponseDTO> requestExceptionHandler(FileProcessingException ex){
+        ErrorResponseDTO error = ErrorResponseDTO.builder()
+                .code("400")
+                .message(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(value = UnauthorizedModificationException.class)
     public ResponseEntity<ErrorResponseDTO> requestExceptionHandler(UnauthorizedModificationException ex){
         ErrorResponseDTO error = ErrorResponseDTO.builder()
