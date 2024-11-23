@@ -9,6 +9,7 @@ import com.bclis.utils.exceptions.FileProcessingException;
 import com.bclis.utils.exceptions.NotFoundException;
 import io.minio.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class DocumentService {
 
     private final DocumentRepository documentRepository;
@@ -143,7 +145,7 @@ public class DocumentService {
         );
 
         // Mostrar el tipo de contenido para depuración
-        System.out.println("Tipo de contenido: " + stat.contentType());
+        log.info("Tipo de contenido: {}", stat.contentType());
 
         // Construir la respuesta con el archivo descargado
         return ResponseEntity.ok()
