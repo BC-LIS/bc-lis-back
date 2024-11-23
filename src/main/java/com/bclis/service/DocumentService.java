@@ -5,6 +5,7 @@ import com.bclis.dto.request.DocumentUpdateDTO;
 import com.bclis.dto.response.DocumentResponseDTO;
 import com.bclis.persistence.entity.*;
 import com.bclis.persistence.repository.*;
+import com.bclis.utils.exceptions.FileProcessingException;
 import com.bclis.utils.exceptions.NotFoundException;
 import io.minio.*;
 import lombok.RequiredArgsConstructor;
@@ -96,7 +97,7 @@ public class DocumentService {
     // Método para obtener información de un documento por ID
     public DocumentResponseDTO getDocumentById(Long id) {
         DocumentEntity document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(DOCUMENT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(DOCUMENT_NOT_FOUND));
 
         return modelMapper.map(document, DocumentResponseDTO.class);
     }
@@ -114,7 +115,7 @@ public class DocumentService {
     public ResponseEntity<byte[]> downloadDocument(Long id) throws Exception {
         // Obtener la información del documento de la base de datos
         DocumentEntity document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(DOCUMENT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(DOCUMENT_NOT_FOUND));
 
         // Obtener el archivo desde MinIO usando el objectName
         InputStream stream = minioClient.getObject(
@@ -130,7 +131,7 @@ public class DocumentService {
 
         // Verificar si el archivo se ha leído correctamente
         if (fileBytes.length == 0) {
-            throw new RuntimeException("El archivo está vacío o no se pudo leer.");
+            throw new FileProcessingException("El archivo está vacío o no se pudo leer.");
         }
 
         // Obtener los metadatos del archivo en MinIO
@@ -155,7 +156,7 @@ public class DocumentService {
     public void deleteDocument(Long id) throws Exception {
         // Obtener el documento desde la base de datos
         DocumentEntity document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(DOCUMENT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(DOCUMENT_NOT_FOUND));
 
         // Eliminar el archivo de MinIO
         minioClient.removeObject(
