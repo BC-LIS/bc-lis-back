@@ -8,6 +8,7 @@ import com.bclis.persistence.repository.*;
 import com.bclis.utils.exceptions.FileProcessingException;
 import com.bclis.utils.exceptions.NotFoundException;
 import io.minio.*;
+import io.minio.errors.MinioException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -21,7 +22,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -48,7 +53,7 @@ public class DocumentService {
     private static final String DOCUMENT_NOT_FOUND = "Document not found";
 
     // Método para crear un nuevo documento y subir el archivo a MinIO
-    public DocumentResponseDTO createDocument(DocumentCreateDTO documentDTO) throws Exception {
+    public DocumentResponseDTO createDocument(DocumentCreateDTO documentDTO) throws MinioException, IOException, GeneralSecurityException {
 
         // Obtener el archivo del DTO
         MultipartFile file = documentDTO.getFile();
@@ -95,7 +100,6 @@ public class DocumentService {
         return modelMapper.map(savedDocument, DocumentResponseDTO.class);
     }
 
-
     // Método para obtener información de un documento por ID
     public DocumentResponseDTO getDocumentById(Long id) {
         DocumentEntity document = documentRepository.findById(id)
@@ -114,7 +118,7 @@ public class DocumentService {
     }
 
     // Método para descargar un documento por ID
-    public ResponseEntity<byte[]> downloadDocument(Long id) throws Exception {
+    public ResponseEntity<byte[]> downloadDocument(Long id) throws MinioException, IOException, GeneralSecurityException {
         // Obtener la información del documento de la base de datos
         DocumentEntity document = documentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(DOCUMENT_NOT_FOUND));
@@ -155,7 +159,7 @@ public class DocumentService {
     }
 
     // Método para eliminar un documento por ID
-    public void deleteDocument(Long id) throws Exception {
+    public void deleteDocument(Long id) throws MinioException, IOException, GeneralSecurityException {
         // Obtener el documento desde la base de datos
         DocumentEntity document = documentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(DOCUMENT_NOT_FOUND));
@@ -173,11 +177,11 @@ public class DocumentService {
     }
 
     // Método para actualizar un documento
-    public DocumentResponseDTO updateDocument(Long documentId, DocumentUpdateDTO documentDTO) throws Exception {
+    public DocumentResponseDTO updateDocument(Long documentId, DocumentUpdateDTO documentDTO) throws NotFoundException {
 
         // Obtener el documento existente desde la base de datos
         DocumentEntity document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new NotFoundException("Document not found"));
+                .orElseThrow(() -> new NotFoundException(DOCUMENT_NOT_FOUND));
 
         // Actualizar el nombre
         if (documentDTO.getName() != null && !documentDTO.getName().isEmpty()) {
