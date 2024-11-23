@@ -31,6 +31,8 @@ public class CommentService {
     private final ModelMapper modelMapper;
     private final JwtUtils jwtUtils;
 
+    private static final String COMMENT_NOT_FOUND = "Comment not found";
+
     public CommentResponseDTO createComment(CommentCreateDTO commentCreateDTO) {
         DocumentEntity documentEntity = documentRepository.findById(commentCreateDTO.getDocumentId())
                 .orElseThrow(() -> new NotFoundException("Document not found"));
@@ -60,7 +62,7 @@ public class CommentService {
 
     public CommentResponseDTO updateCommentState(CommentStateUpdateDTO commentStateUpdateDTO){
         CommentEntity commentEntity = commentRepository.findById(commentStateUpdateDTO.getId())
-                .orElseThrow(() -> new NotFoundException("Comment not found"));
+                .orElseThrow(() -> new NotFoundException(COMMENT_NOT_FOUND));
 
         commentEntity.setState(commentStateUpdateDTO.getCommentState());
         commentRepository.save(commentEntity);
@@ -70,7 +72,7 @@ public class CommentService {
 
     public CommentResponseDTO updateCommentContent(CommentContentUpdateDTO commentContentUpdateDTO) {
         CommentEntity commentEntity = commentRepository.findById(commentContentUpdateDTO.getId())
-                .orElseThrow(() -> new NotFoundException("Comment not found"));
+                .orElseThrow(() -> new NotFoundException(COMMENT_NOT_FOUND));
 
         String author = commentEntity.getUser().getUsername();
         String authenticatedUser = jwtUtils.getUsernameFromSecurityContext();
@@ -87,7 +89,7 @@ public class CommentService {
 
     public CommentResponseDTO deleteComment(Long commentId) {
         CommentEntity commentEntity = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundException("Comment not found"));
+                .orElseThrow(() -> new NotFoundException(COMMENT_NOT_FOUND));
 
         String author = commentEntity.getUser().getUsername();
         String authenticatedUser = jwtUtils.getUsernameFromSecurityContext();

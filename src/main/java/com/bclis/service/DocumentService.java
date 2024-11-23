@@ -42,6 +42,8 @@ public class DocumentService {
     @Value("${minio.bucket-name}")
     private String bucketName;
 
+    private static final String DOCUMENT_NOT_FOUND = "Document not found";
+
     // Método para crear un nuevo documento y subir el archivo a MinIO
     public DocumentResponseDTO createDocument(DocumentCreateDTO documentDTO) throws Exception {
 
@@ -94,7 +96,7 @@ public class DocumentService {
     // Método para obtener información de un documento por ID
     public DocumentResponseDTO getDocumentById(Long id) {
         DocumentEntity document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Documento no encontrado"));
+                .orElseThrow(() -> new RuntimeException(DOCUMENT_NOT_FOUND));
 
         // Crear el DTO de respuesta
         DocumentResponseDTO responseDTO = modelMapper.map(document, DocumentResponseDTO.class);
@@ -115,7 +117,7 @@ public class DocumentService {
     public ResponseEntity<byte[]> downloadDocument(Long id) throws Exception {
         // Obtener la información del documento de la base de datos
         DocumentEntity document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Documento no encontrado"));
+                .orElseThrow(() -> new RuntimeException(DOCUMENT_NOT_FOUND));
 
         // Obtener el archivo desde MinIO usando el objectName
         InputStream stream = minioClient.getObject(
@@ -156,7 +158,7 @@ public class DocumentService {
     public void deleteDocument(Long id) throws Exception {
         // Obtener el documento desde la base de datos
         DocumentEntity document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Documento no encontrado"));
+                .orElseThrow(() -> new RuntimeException(DOCUMENT_NOT_FOUND));
 
         // Eliminar el archivo de MinIO
         minioClient.removeObject(
@@ -211,13 +213,5 @@ public class DocumentService {
         // Convertir la entidad document actualizada a DocumentResponseDTO usando ModelMapper
         return modelMapper.map(updatedDocument, DocumentResponseDTO.class);
     }
-
-
-
-
-
-
-
-
 
 }
