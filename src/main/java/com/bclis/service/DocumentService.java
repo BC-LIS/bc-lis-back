@@ -5,9 +5,12 @@ import com.bclis.dto.request.DocumentUpdateDTO;
 import com.bclis.dto.response.DocumentResponseDTO;
 import com.bclis.persistence.entity.*;
 import com.bclis.persistence.repository.*;
+import com.bclis.utils.exceptions.FileProcessingException;
 import com.bclis.utils.exceptions.NotFoundException;
 import io.minio.*;
+import io.minio.errors.MinioException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,15 +22,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
+import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class DocumentService {
 
     private final DocumentRepository documentRepository;
@@ -42,8 +46,10 @@ public class DocumentService {
     @Value("${minio.bucket-name}")
     private String bucketName;
 
+    private static final String DOCUMENT_NOT_FOUND = "Document not found";
+
     // Método para crear un nuevo documento y subir el archivo a MinIO
-    public DocumentResponseDTO createDocument(DocumentCreateDTO documentDTO) throws Exception {
+    public DocumentResponseDTO createDocument(DocumentCreateDTO documentDTO) throws MinioException, IOException, GeneralSecurityException {
 
         // Obtener el archivo del DTO
         MultipartFile file = documentDTO.getFile();
@@ -90,16 +96,12 @@ public class DocumentService {
         return modelMapper.map(savedDocument, DocumentResponseDTO.class);
     }
 
-
     // Método para obtener información de un documento por ID
     public DocumentResponseDTO getDocumentById(Long id) {
         DocumentEntity document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Documento no encontrado"));
+                .orElseThrow(() -> new NotFoundException(DOCUMENT_NOT_FOUND));
 
-        // Crear el DTO de respuesta
-        DocumentResponseDTO responseDTO = modelMapper.map(document, DocumentResponseDTO.class);
-
-        return responseDTO;
+        return modelMapper.map(document, DocumentResponseDTO.class);
     }
 
     public List<DocumentResponseDTO> getAllDocuments() {
@@ -112,10 +114,10 @@ public class DocumentService {
     }
 
     // Método para descargar un documento por ID
-    public ResponseEntity<byte[]> downloadDocument(Long id) throws Exception {
+    public ResponseEntity<byte[]> downloadDocument(Long id) throws MinioException, IOException, GeneralSecurityException {
         // Obtener la información del documento de la base de datos
         DocumentEntity document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Documento no encontrado"));
+                .orElseThrow(() -> new NotFoundException(DOCUMENT_NOT_FOUND));
 
         // Obtener el archivo desde MinIO usando el objectName
         InputStream stream = minioClient.getObject(
@@ -131,7 +133,7 @@ public class DocumentService {
 
         // Verificar si el archivo se ha leído correctamente
         if (fileBytes.length == 0) {
-            throw new RuntimeException("El archivo está vacío o no se pudo leer.");
+            throw new FileProcessingException("El archivo está vacío o no se pudo leer.");
         }
 
         // Obtener los metadatos del archivo en MinIO
@@ -143,7 +145,7 @@ public class DocumentService {
         );
 
         // Mostrar el tipo de contenido para depuración
-        System.out.println("Tipo de contenido: " + stat.contentType());
+        log.info("Tipo de contenido: {}", stat.contentType());
 
         // Construir la respuesta con el archivo descargado
         return ResponseEntity.ok()
@@ -153,10 +155,10 @@ public class DocumentService {
     }
 
     // Método para eliminar un documento por ID
-    public void deleteDocument(Long id) throws Exception {
+    public void deleteDocument(Long id) throws MinioException, IOException, GeneralSecurityException {
         // Obtener el documento desde la base de datos
         DocumentEntity document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Documento no encontrado"));
+                .orElseThrow(() -> new NotFoundException(DOCUMENT_NOT_FOUND));
 
         // Eliminar el archivo de MinIO
         minioClient.removeObject(
@@ -171,11 +173,11 @@ public class DocumentService {
     }
 
     // Método para actualizar un documento
-    public DocumentResponseDTO updateDocument(Long documentId, DocumentUpdateDTO documentDTO) throws Exception {
+    public DocumentResponseDTO updateDocument(Long documentId, DocumentUpdateDTO documentDTO) throws NotFoundException {
 
         // Obtener el documento existente desde la base de datos
         DocumentEntity document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new NotFoundException("Document not found"));
+                .orElseThrow(() -> new NotFoundException(DOCUMENT_NOT_FOUND));
 
         // Actualizar el nombre
         if (documentDTO.getName() != null && !documentDTO.getName().isEmpty()) {
@@ -211,13 +213,5 @@ public class DocumentService {
         // Convertir la entidad document actualizada a DocumentResponseDTO usando ModelMapper
         return modelMapper.map(updatedDocument, DocumentResponseDTO.class);
     }
-
-
-
-
-
-
-
-
 
 }

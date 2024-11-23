@@ -12,15 +12,13 @@ import lombok.Setter;
 public class LoginDTO {
     @Schema(description = "Username of the user attempting to log in",
             example = "jdoe",
-            type = "string",
-            required = true)
+            type = "string")
     @NotBlank(message = "Username is required")
     private String username;
 
     @Schema(description = "Password of the user attempting to log in",
             example = "securePassword123",
             type = "string",
-            required = true,
             format = "password")
     @NotBlank(message = "Password is required")
     private String password;

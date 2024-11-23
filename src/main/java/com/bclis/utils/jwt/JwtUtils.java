@@ -101,10 +101,9 @@ public class JwtUtils {
             return authentication.getAuthorities()
                     .stream()
                     .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         return List.of();
     }
-
 }
