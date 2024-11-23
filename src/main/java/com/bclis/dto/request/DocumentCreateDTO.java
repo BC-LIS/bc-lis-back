@@ -17,7 +17,6 @@ public class DocumentCreateDTO {
     @Schema(description = "Name of the document",
             example = "Project Proposal",
             type = "string",
-            required = true,
             minLength = 3,
             maxLength = 100)
     private String name;
@@ -32,24 +31,20 @@ public class DocumentCreateDTO {
 
     @Schema(description = "File to be uploaded, representing the document content",
             type = "string",
-            format = "binary",
-            required = true)
+            format = "binary")
     private MultipartFile file;
 
 
     @Schema(description = "Current state of the document",
             example = "DRAFT",
             type = "string",
-            allowableValues = {"DRAFT", "PUBLISHED", "ARCHIVED"},
-            required = true)
+            allowableValues = {"DRAFT", "PUBLISHED", "ARCHIVED"})
     private DocumentEntity.DocumentState state;
 
 
     @Schema(description = "Type of the document (Programming, Administrative or Both)",
             example = "Programming",
-
             type = "string",
-            required = true,
             minLength = 3,
             maxLength = 50)
     private String typeName;
@@ -57,12 +52,11 @@ public class DocumentCreateDTO {
 
     @Schema(description = "Username of the creator of the document",
             example = "jdoe",
-            type = "string",
-            required = true)
+            type = "string")
     private String username;
 
     /**
-     * List of categories associated with the document, allowing categorization and tagging.
+     * List of categories associated with the document
      */
     @Schema(description = "Categories associated with the document, must contain at least one category",
             example = "[\"Ansible\", \"Docker\", \"Projects\"]",
