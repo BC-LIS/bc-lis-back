@@ -98,10 +98,7 @@ public class DocumentService {
         DocumentEntity document = documentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(DOCUMENT_NOT_FOUND));
 
-        // Crear el DTO de respuesta
-        DocumentResponseDTO responseDTO = modelMapper.map(document, DocumentResponseDTO.class);
-
-        return responseDTO;
+        return modelMapper.map(document, DocumentResponseDTO.class);
     }
 
     public List<DocumentResponseDTO> getAllDocuments() {
