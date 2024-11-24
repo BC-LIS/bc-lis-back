@@ -49,7 +49,7 @@ public class DocumentService {
     private static final String DOCUMENT_NOT_FOUND = "Document not found";
 
     // Método para crear un nuevo documento y subir el archivo a MinIO
-    public DocumentResponseDTO createDocument(DocumentCreateDTO documentDTO) throws Exception {
+    public DocumentResponseDTO createDocument(DocumentCreateDTO documentDTO) throws MinioException, IOException, GeneralSecurityException {
 
         if (documentDTO.getCategories() == null || documentDTO.getCategories().isEmpty()) {
             throw new IllegalArgumentException("Categories cannot be null or empty");
@@ -168,7 +168,7 @@ public class DocumentService {
     }
 
     // Método para actualizar un documento
-    public DocumentResponseDTO updateDocument(Long documentId, DocumentUpdateDTO documentDTO) throws NotFoundException {
+    public DocumentResponseDTO updateDocument(Long documentId, DocumentUpdateDTO documentDTO) {
 
         // Obtener el documento existente desde la base de datos
         DocumentEntity document = documentRepository.findById(documentId)

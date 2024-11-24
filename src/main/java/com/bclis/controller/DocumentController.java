@@ -5,6 +5,7 @@ import com.bclis.dto.request.DocumentUpdateDTO;
 import com.bclis.dto.response.DocumentResponseDTO;
 import com.bclis.service.DocumentFilterService;
 import com.bclis.service.DocumentService;
+import io.minio.errors.MinioException;
 import jakarta.validation.Valid;
 import com.bclis.utils.constans.ApiDescription;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Map;
 
@@ -35,19 +38,15 @@ public class DocumentController {
     @Operation(summary = "Create document", description = ApiDescription.CREATE_DOCUMENT_DESCRIPTION)
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<DocumentResponseDTO> createDocument(@ModelAttribute DocumentCreateDTO documentDTO) throws Exception {
-
         DocumentResponseDTO response = documentService.createDocument(documentDTO);
         return ResponseEntity.ok(response);
-
     }
 
     @Operation(summary = "Get document by Id", description = ApiDescription.GET_DOCUMENT_DESCRIPTION)
     @GetMapping("/{id}")
     public ResponseEntity<DocumentResponseDTO> getDocumentById(@PathVariable Long id) {
-
         DocumentResponseDTO response = documentService.getDocumentById(id);
         return ResponseEntity.ok(response);
-
     }
 
     @Operation(summary = "Get all available documents", description = ApiDescription.GET_ALL_DOCUMENT_DESCRIPTION)
@@ -59,19 +58,18 @@ public class DocumentController {
 
     @Operation(summary = "Get document by Id to download", description = ApiDescription.GET_DOCUMENT_TO_DOWNLOAD_DESCRIPTION)
     @GetMapping("/{id}/download")
-    public ResponseEntity<byte[]> downloadDocument(@PathVariable Long id) throws Exception {
+    public ResponseEntity<byte[]> downloadDocument(@PathVariable Long id) throws GeneralSecurityException, MinioException, IOException {
         return documentService.downloadDocument(id);
-
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDocument(@PathVariable Long id) throws Exception {
+    public ResponseEntity<Void> deleteDocument(@PathVariable Long id) throws GeneralSecurityException, MinioException, IOException {
         documentService.deleteDocument(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/update/{documentId}")
-    public ResponseEntity<DocumentResponseDTO> updateDocument(@PathVariable Long documentId, @RequestBody @Valid DocumentUpdateDTO documentUpdateDTO) throws Exception {
+    public ResponseEntity<DocumentResponseDTO> updateDocument(@PathVariable Long documentId, @RequestBody @Valid DocumentUpdateDTO documentUpdateDTO) {
 
         DocumentResponseDTO updatedDocument = documentService.updateDocument(documentId, documentUpdateDTO);
         return ResponseEntity.ok(updatedDocument);
