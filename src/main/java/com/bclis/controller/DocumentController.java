@@ -37,7 +37,7 @@ public class DocumentController {
 
     @Operation(summary = "Create document", description = ApiDescription.CREATE_DOCUMENT_DESCRIPTION)
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<DocumentResponseDTO> createDocument(@ModelAttribute DocumentCreateDTO documentDTO) throws Exception {
+    public ResponseEntity<DocumentResponseDTO> createDocument(@ModelAttribute DocumentCreateDTO documentDTO) throws GeneralSecurityException, MinioException, IOException {
         DocumentResponseDTO response = documentService.createDocument(documentDTO);
         return ResponseEntity.ok(response);
     }
