@@ -49,15 +49,14 @@ public class DocumentService {
     private static final String DOCUMENT_NOT_FOUND = "Document not found";
 
     // Método para crear un nuevo documento y subir el archivo a MinIO
-    public DocumentResponseDTO createDocument(DocumentCreateDTO documentDTO) throws MinioException, IOException, GeneralSecurityException {
+    public DocumentResponseDTO createDocument(DocumentCreateDTO documentDTO) throws Exception {
 
-        // Obtener el archivo del DTO
+        if (documentDTO.getCategories() == null || documentDTO.getCategories().isEmpty()) {
+            throw new IllegalArgumentException("Categories cannot be null or empty");
+        }
+
         MultipartFile file = documentDTO.getFile();
-
-        // Generar un nombre único para el objeto en MinIO
         String objectName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-
-        // Subir el archivo a MinIO
         minioClient.putObject(
                 PutObjectArgs.builder()
                         .bucket(bucketName)
@@ -67,32 +66,28 @@ public class DocumentService {
                         .build()
         );
 
-        // Convertir el DTO en la entidad Document usando ModelMapper
-        DocumentEntity document = modelMapper.map(documentDTO, DocumentEntity.class);
+        DocumentEntity document = new DocumentEntity();
+        document.setName(documentDTO.getName());
+        document.setDescription(documentDTO.getDescription());
+        document.setObjectName(objectName);
+        document.setState(DocumentEntity.DocumentState.DRAFT);
 
-        // Obtener el tipo y usuario desde los repositorios
         TypeEntity typeEntity = typeRepository.findByName(documentDTO.getTypeName())
                 .orElseThrow(() -> new NotFoundException("Type not found"));
+        document.setType(typeEntity);
 
         UserEntity userEntity = userRepository.findByUsername(documentDTO.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
-
-        // Obtener las categorías desde el repositorio
-        documentDTO.getCategories()
-                .stream()
-                .map(categoryString -> categoryRepository.findByName(categoryString)
-                        .orElseThrow(() -> new NotFoundException("Category not found")))
-                .forEach(document::addCategory); // Usamos el método addCategory
-
-        // Asignar el nombre del objeto en MinIO, tipo y usuario
-        document.setObjectName(objectName);
-        document.setType(typeEntity);
         document.setUser(userEntity);
 
-        // Guardar el documento en la base de datos
+        List<CategoryEntity> categories = documentDTO.getCategories().stream()
+                .map(categoryName -> categoryRepository.findByName(categoryName)
+                        .orElseThrow(() -> new NotFoundException("Category not found: " + categoryName)))
+                .toList();
+        categories.forEach(document::addCategory);
+
         DocumentEntity savedDocument = documentRepository.save(document);
 
-        // Convertir la entidad guardada en DocumentResponseDTO usando ModelMapper
         return modelMapper.map(savedDocument, DocumentResponseDTO.class);
     }
 
