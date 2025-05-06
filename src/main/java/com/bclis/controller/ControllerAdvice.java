@@ -83,4 +83,13 @@ public class ControllerAdvice {
                 .build();
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler(value = InvalidEmailOrUsernameException.class)
+    public ResponseEntity<ErrorResponseDTO> requestExceptionHandler(InvalidEmailOrUsernameException ex){
+        ErrorResponseDTO error = ErrorResponseDTO.builder()
+                .code("400")
+                .message(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }

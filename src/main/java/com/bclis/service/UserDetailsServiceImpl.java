@@ -8,6 +8,7 @@ import com.bclis.persistence.entity.UserEntity;
 import com.bclis.persistence.entity.enums.EnumRole;
 import com.bclis.persistence.repository.RoleRepository;
 import com.bclis.persistence.repository.UserRepository;
+import com.bclis.utils.exceptions.InvalidEmailOrUsernameException;
 import com.bclis.utils.exceptions.NotFoundException;
 import com.bclis.utils.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -40,10 +43,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         UserEntity userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
 
+        if (userEntity.getIsActive().equals(Boolean.FALSE)) {
+            throw new BadCredentialsException("The user is not active");
+        }
+
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-
         authorityList.add(new SimpleGrantedAuthority("ROLE_".concat(userEntity.getRole().getRoleName().name())));
-
         userEntity.getRole().getPermissions()
                 .forEach(permission -> authorityList.add(new SimpleGrantedAuthority(permission.getPermissionName())));
 
@@ -64,7 +69,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = jwtUtils.generateAccessToken(authentication);
-
         UserEntity userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
 
@@ -84,7 +88,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (userDetails == null) {
             throw new BadCredentialsException("Invalid username or password");
         }
-
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new BadCredentialsException("Incorrect Password");
         }
@@ -93,10 +96,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public void createUser(CreateUserDTO createUserDTO) {
-
         RoleEntity roleEntity = roleRepository
                 .findByRoleName(EnumRole.valueOf(createUserDTO.getRole()))
                 .orElseThrow(() -> new NotFoundException("Role not found"));
+
+        this.validateUdeaEmail(createUserDTO.getEmail());
+        this.validateUsername(createUserDTO.getEmail(), createUserDTO.getUsername());
 
         UserEntity userEntity = UserEntity.builder()
                 .username(createUserDTO.getUsername())
@@ -105,8 +110,27 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .lastname(createUserDTO.getLastname())
                 .email(createUserDTO.getEmail())
                 .role(roleEntity)
+                .isActive(true)
                 .build();
 
         userRepository.save(userEntity);
+    }
+
+    private void validateUsername(String email, String username) {
+        String userFromTheEmail = email.split("@")[0];
+
+        if (!userFromTheEmail.equals(username)) {
+            throw new InvalidEmailOrUsernameException("The username must match the user's email address.");
+        }
+    }
+
+    private void validateUdeaEmail(String email) {
+        String regex = "^[a-zA-Z0-9._%+-]+@udea\\.edu\\.co$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(email);
+
+        if (!matcher.matches()) {
+            throw new InvalidEmailOrUsernameException("Invalid email address. Only UdeA email addresses may be used.");
+        }
     }
 }
