@@ -15,6 +15,6 @@ public class CommentResponseDTO {
     private String content;
     private LocalDateTime createdAt;
     private CommentEntity.CommentState commentState;
-    private UserResponseDTO user;
+    private UserCommentResponseDTO user;
     private Long documentId;
 }

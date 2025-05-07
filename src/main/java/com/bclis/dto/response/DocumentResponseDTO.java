@@ -19,7 +19,7 @@ public class DocumentResponseDTO {
     private LocalDateTime updatedAt;
     private DocumentEntity.DocumentState state;
     private TypeResponseDTO type;
-    private UserResponseDTO user;
+    private UserCommentResponseDTO user;
     private List<CategoryResponseDTO> categories;
 }
 

@@ -3,6 +3,7 @@ package com.bclis.service;
 import com.bclis.dto.request.CreateUserDTO;
 import com.bclis.dto.request.LoginDTO;
 import com.bclis.dto.response.AuthResponseDTO;
+import com.bclis.dto.response.UserResponseDTO;
 import com.bclis.persistence.entity.RoleEntity;
 import com.bclis.persistence.entity.UserEntity;
 import com.bclis.persistence.entity.enums.EnumRole;
@@ -12,6 +13,7 @@ import com.bclis.utils.exceptions.InvalidEmailOrUsernameException;
 import com.bclis.utils.exceptions.NotFoundException;
 import com.bclis.utils.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,6 +39,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final RoleRepository roleRepository;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -95,7 +98,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
     }
 
-    public void createUser(CreateUserDTO createUserDTO) {
+    public UserResponseDTO createUser(CreateUserDTO createUserDTO) {
         RoleEntity roleEntity = roleRepository
                 .findByRoleName(EnumRole.valueOf(createUserDTO.getRole()))
                 .orElseThrow(() -> new NotFoundException("Role not found"));
@@ -113,7 +116,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .isActive(true)
                 .build();
 
-        userRepository.save(userEntity);
+        return modelMapper.map(userRepository.save(userEntity), UserResponseDTO.class);
     }
 
     private void validateUsername(String email, String username) {
