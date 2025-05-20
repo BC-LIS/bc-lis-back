@@ -2,6 +2,7 @@ package com.bclis.service;
 
 import com.bclis.dto.request.CreateUserDTO;
 import com.bclis.dto.request.LoginDTO;
+import com.bclis.dto.request.UserFiltersDto;
 import com.bclis.dto.response.AuthResponseDTO;
 import com.bclis.dto.response.UserResponseDTO;
 import com.bclis.persistence.entity.RoleEntity;
@@ -14,6 +15,9 @@ import com.bclis.utils.exceptions.NotFoundException;
 import com.bclis.utils.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,14 +35,18 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.bclis.persistence.specification.*;
+
+
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
+    private final UserSpecification userSpecification;
+    private final JwtUtils jwtUtils;
     private final ModelMapper modelMapper;
 
     @Override
@@ -117,6 +125,38 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .build();
 
         return modelMapper.map(userRepository.save(userEntity), UserResponseDTO.class);
+    }
+
+    public Page<UserResponseDTO> getAllUsers(Pageable pageable, UserFiltersDto userFiltersDto) {
+        Specification<UserEntity> specification = this.applyFilter(userFiltersDto);
+        Page<UserEntity> pageUserEntity = userRepository.findAll(specification, pageable);
+        return pageUserEntity.map(user -> modelMapper.map(user, UserResponseDTO.class));
+    }
+
+    private Specification<UserEntity> applyFilter(UserFiltersDto userFiltersDto) {
+        Specification<UserEntity> specification = Specification.where(null);
+
+        if (userFiltersDto == null) {
+            return specification;
+        }
+
+        if (!(userFiltersDto.getName() == null || userFiltersDto.getName().isEmpty())) {
+            specification = specification.and(
+                    userSpecification.hasAttribute("name", userFiltersDto.getName())
+            );
+        }
+        if (!(userFiltersDto.getRole() == null || userFiltersDto.getRole().name().isEmpty())) {
+            specification = specification.and(
+                    userSpecification.hasAttribute("roleName", userFiltersDto.getRole().name(), "role")
+            );
+        }
+        if (userFiltersDto.getIsActive() != null) {
+            specification = specification.and(
+                    userSpecification.hasAttribute("isActive", userFiltersDto.getIsActive())
+            );
+        }
+
+        return specification;
     }
 
     private void validateUsername(String email, String username) {
