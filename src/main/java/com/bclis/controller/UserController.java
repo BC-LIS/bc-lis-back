@@ -35,4 +35,9 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> updateUserStatus(@RequestParam String username, @RequestParam Boolean isActive) {
         return ResponseEntity.ok(userDetailsService.updateUserStatus(username, isActive));
     }
+
+    @PatchMapping("/password")
+    public ResponseEntity<UserResponseDTO> updateUserPassword(@RequestParam String oldPassword, @RequestParam String newPassword) {
+        return ResponseEntity.ok(userDetailsService.updateUserPassword(oldPassword, newPassword));
+    }
 }

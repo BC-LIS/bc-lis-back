@@ -11,6 +11,7 @@ import com.bclis.persistence.entity.enums.EnumRole;
 import com.bclis.persistence.repository.RoleRepository;
 import com.bclis.persistence.repository.UserRepository;
 import com.bclis.utils.exceptions.InvalidEmailOrUsernameException;
+import com.bclis.utils.exceptions.InvalidPasswordException;
 import com.bclis.utils.exceptions.NotFoundException;
 import com.bclis.utils.exceptions.UnauthorizedModificationException;
 import com.bclis.utils.jwt.JwtUtils;
@@ -143,6 +144,23 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         user.setIsActive(isActive);
+        return modelMapper.map(userRepository.save(user), UserResponseDTO.class);
+    }
+
+    public UserResponseDTO updateUserPassword(String oldPassword, String newPassword) {
+        String username = jwtUtils.getUsernameFromSecurityContext();
+
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new InvalidPasswordException("The current password is invalid");
+        }
+        if (oldPassword.equals(newPassword)) {
+            throw new InvalidPasswordException("The new password must be different from the previous password.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
         return modelMapper.map(userRepository.save(user), UserResponseDTO.class);
     }
 

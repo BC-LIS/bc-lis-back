@@ -92,4 +92,13 @@ public class ControllerAdvice {
                 .build();
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = InvalidPasswordException.class)
+    public ResponseEntity<ErrorResponseDTO> requestExceptionHandler(InvalidPasswordException ex){
+        ErrorResponseDTO error = ErrorResponseDTO.builder()
+                .code("403")
+                .message(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
 }
