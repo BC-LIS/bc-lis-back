@@ -30,4 +30,9 @@ public class UserController {
         UserFiltersDto userFiltersDto = new UserFiltersDto(name, role, isActive);
         return ResponseEntity.ok(userDetailsService.getAllUsers(pageable, userFiltersDto));
     }
+
+    @PatchMapping("/isActive")
+    public ResponseEntity<UserResponseDTO> updateUserStatus(@RequestParam String username, @RequestParam Boolean isActive) {
+        return ResponseEntity.ok(userDetailsService.updateUserStatus(username, isActive));
+    }
 }

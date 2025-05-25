@@ -12,6 +12,7 @@ import com.bclis.persistence.repository.RoleRepository;
 import com.bclis.persistence.repository.UserRepository;
 import com.bclis.utils.exceptions.InvalidEmailOrUsernameException;
 import com.bclis.utils.exceptions.NotFoundException;
+import com.bclis.utils.exceptions.UnauthorizedModificationException;
 import com.bclis.utils.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -131,6 +132,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Specification<UserEntity> specification = this.applyFilter(userFiltersDto);
         Page<UserEntity> pageUserEntity = userRepository.findAll(specification, pageable);
         return pageUserEntity.map(user -> modelMapper.map(user, UserResponseDTO.class));
+    }
+
+    public UserResponseDTO updateUserStatus(String username, Boolean isActive) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+
+        if (user.getRole().getRoleName().name().equals(EnumRole.ADMIN.name())) {
+            throw new UnauthorizedModificationException("Only TECHNICAL and GENERIC users can be deactivated or activated.");
+        }
+
+        user.setIsActive(isActive);
+        return modelMapper.map(userRepository.save(user), UserResponseDTO.class);
     }
 
     private Specification<UserEntity> applyFilter(UserFiltersDto userFiltersDto) {
