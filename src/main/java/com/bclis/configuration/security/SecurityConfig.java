@@ -1,6 +1,7 @@
 package com.bclis.configuration.security;
 
 import com.bclis.configuration.security.filters.JwtAuthorizationFilter;
+import com.bclis.persistence.entity.enums.EnumRole;
 import com.bclis.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -35,8 +36,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/v1/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
-                    auth.requestMatchers("/auth/register").hasRole("ADMIN");
-                    auth.requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN");
+                    auth.requestMatchers("/auth/register").hasRole(EnumRole.ADMIN.name());
+                    auth.requestMatchers(HttpMethod.GET, "/users").hasRole(EnumRole.ADMIN.name());
+                    auth.requestMatchers(HttpMethod.PATCH, "/users/role").hasRole(EnumRole.ADMIN.name());
                     auth.requestMatchers(HttpMethod.PATCH, "/users/**").authenticated();
                     auth.requestMatchers("/auth/login").permitAll();
                     auth.anyRequest().authenticated();

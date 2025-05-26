@@ -11,10 +11,7 @@ import com.bclis.persistence.entity.UserEntity;
 import com.bclis.persistence.entity.enums.EnumRole;
 import com.bclis.persistence.repository.RoleRepository;
 import com.bclis.persistence.repository.UserRepository;
-import com.bclis.utils.exceptions.InvalidEmailOrUsernameException;
-import com.bclis.utils.exceptions.InvalidPasswordException;
-import com.bclis.utils.exceptions.NotFoundException;
-import com.bclis.utils.exceptions.UnauthorizedModificationException;
+import com.bclis.utils.exceptions.*;
 import com.bclis.utils.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -178,6 +175,28 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             user.setName(updateUserDTO.getLastName());
         }
 
+        return modelMapper.map(userRepository.save(user), UserResponseDTO.class);
+    }
+
+    public UserResponseDTO updateUserRole(String username, EnumRole newRoleName) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+        String userRoleName = user.getRole().getRoleName().name();
+
+        if (newRoleName.name().equals(EnumRole.ADMIN.name())) {
+            throw new UnauthorizedModificationException("Only TECHNICAL and GENERIC roles can be selected.");
+        }
+        if (userRoleName.equals(newRoleName.name())) {
+            throw new InvalidRoleException("the user already has this role");
+        }
+        if (userRoleName.equals(EnumRole.ADMIN.name())) {
+            throw new UnauthorizedModificationException("The ADMIN user can not be updated");
+        }
+
+        RoleEntity newRoleEntity = roleRepository.findByRoleName(newRoleName)
+                .orElseThrow(() -> new NotFoundException("Role not found"));
+
+        user.setRole(newRoleEntity);
         return modelMapper.map(userRepository.save(user), UserResponseDTO.class);
     }
 

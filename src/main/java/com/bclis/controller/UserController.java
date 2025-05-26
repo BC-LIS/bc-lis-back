@@ -42,6 +42,11 @@ public class UserController {
         return ResponseEntity.ok(userDetailsService.updateUserPassword(oldPassword, newPassword));
     }
 
+    @PatchMapping("/role")
+    public ResponseEntity<UserResponseDTO> updateUserRole(@RequestParam String username, @RequestParam EnumRole newRoleName) {
+        return ResponseEntity.ok(userDetailsService.updateUserRole(username, newRoleName));
+    }
+
     @PatchMapping()
     public ResponseEntity<UserResponseDTO> updateUserInfo(@RequestBody UpdateUserDTO updateUserDTO) {
         return ResponseEntity.ok(userDetailsService.updateUserInfo(updateUserDTO));
