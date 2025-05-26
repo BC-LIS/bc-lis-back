@@ -1,5 +1,6 @@
 package com.bclis.controller;
 
+import com.bclis.dto.request.UpdateUserDTO;
 import com.bclis.dto.request.UserFiltersDto;
 import com.bclis.dto.response.UserResponseDTO;
 import com.bclis.persistence.entity.enums.EnumRole;
@@ -39,5 +40,10 @@ public class UserController {
     @PatchMapping("/password")
     public ResponseEntity<UserResponseDTO> updateUserPassword(@RequestParam String oldPassword, @RequestParam String newPassword) {
         return ResponseEntity.ok(userDetailsService.updateUserPassword(oldPassword, newPassword));
+    }
+
+    @PatchMapping()
+    public ResponseEntity<UserResponseDTO> updateUserInfo(@RequestBody UpdateUserDTO updateUserDTO) {
+        return ResponseEntity.ok(userDetailsService.updateUserInfo(updateUserDTO));
     }
 }

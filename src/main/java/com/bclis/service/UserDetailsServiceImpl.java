@@ -2,6 +2,7 @@ package com.bclis.service;
 
 import com.bclis.dto.request.CreateUserDTO;
 import com.bclis.dto.request.LoginDTO;
+import com.bclis.dto.request.UpdateUserDTO;
 import com.bclis.dto.request.UserFiltersDto;
 import com.bclis.dto.response.AuthResponseDTO;
 import com.bclis.dto.response.UserResponseDTO;
@@ -161,6 +162,22 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
+        return modelMapper.map(userRepository.save(user), UserResponseDTO.class);
+    }
+
+    public UserResponseDTO updateUserInfo(UpdateUserDTO updateUserDTO) {
+        String username = jwtUtils.getUsernameFromSecurityContext();
+
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+
+        if (!(updateUserDTO.getName() == null || updateUserDTO.getName().isEmpty())) {
+            user.setName(updateUserDTO.getName());
+        }
+        if (!(updateUserDTO.getLastName() == null || updateUserDTO.getLastName().isEmpty())) {
+            user.setName(updateUserDTO.getLastName());
+        }
+
         return modelMapper.map(userRepository.save(user), UserResponseDTO.class);
     }
 

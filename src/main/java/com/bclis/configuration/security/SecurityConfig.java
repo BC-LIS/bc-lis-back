@@ -5,6 +5,7 @@ import com.bclis.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -34,7 +35,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/v1/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
-                    auth.requestMatchers("/auth/register", "/users/").hasRole("ADMIN");
+                    auth.requestMatchers("/auth/register").hasRole("ADMIN");
+                    auth.requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN");
+                    auth.requestMatchers(HttpMethod.PATCH, "/users/**").authenticated();
                     auth.requestMatchers("/auth/login").permitAll();
                     auth.anyRequest().authenticated();
                 })
