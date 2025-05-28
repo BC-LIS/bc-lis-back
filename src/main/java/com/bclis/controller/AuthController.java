@@ -3,6 +3,7 @@ package com.bclis.controller;
 import com.bclis.dto.request.CreateUserDTO;
 import com.bclis.dto.request.LoginDTO;
 import com.bclis.dto.response.AuthResponseDTO;
+import com.bclis.dto.response.UserResponseDTO;
 import com.bclis.service.UserDetailsServiceImpl;
 import com.bclis.utils.constans.ApiDescription;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,8 +28,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Register new user", description = ApiDescription.REGISTER_DESCRIPTION)
-    public ResponseEntity<String> createUser(@RequestBody CreateUserDTO createUserDTO) {
-        userDetailsService.createUser(createUserDTO);
-        return ResponseEntity.ok("User created");
+    public ResponseEntity<UserResponseDTO> createUser(@RequestBody CreateUserDTO createUserDTO) {
+        return ResponseEntity.ok(userDetailsService.createUser(createUserDTO));
     }
 }

@@ -35,9 +35,28 @@ public class DocumentEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(insertable = false, name = "is_editable")
+    private Boolean isEditable;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
     private DocumentState state;
+
+    @ManyToOne
+    @JoinColumn(name = "type_id", nullable = false)
+    private TypeEntity type;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(
+            name = "document_category",
+            joinColumns = @JoinColumn(name = "document_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<CategoryEntity> categories;
 
     public enum DocumentState {
         DRAFT,
@@ -55,23 +74,6 @@ public class DocumentEntity {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
-    @ManyToOne
-    @JoinColumn(name = "type_id", nullable = false)
-    private TypeEntity type;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
-
-
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinTable(
-            name = "document_category",
-            joinColumns = @JoinColumn(name = "document_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private Set<CategoryEntity> categories;
 
     public void addCategory(CategoryEntity category) {
         if (categories == null) {
