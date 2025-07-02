@@ -2,6 +2,7 @@ package com.bclis.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Data
 @Entity
+@Builder
 @Table(name = "document")
 public class DocumentEntity {
 
@@ -26,7 +28,7 @@ public class DocumentEntity {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "object_name", nullable = false)
+    @Column(name = "object_name")
     private String objectName;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -35,8 +37,11 @@ public class DocumentEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(insertable = false, name = "is_editable")
-    private Boolean isEditable;
+    @Column(name = "is_editable", nullable = false)
+    private boolean isEditable;
+
+    @Column(name = "content")
+    private String content;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
@@ -89,8 +94,4 @@ public class DocumentEntity {
             categories.remove(category);
         }
     }
-
-
-
-
 }

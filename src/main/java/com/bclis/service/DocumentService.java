@@ -48,12 +48,42 @@ public class DocumentService {
 
     private static final String DOCUMENT_NOT_FOUND = "Document not found";
 
-    // Método para crear un nuevo documento y subir el archivo a MinIO
-    public DocumentResponseDTO createDocument(DocumentCreateDTO documentDTO) throws MinioException, IOException, GeneralSecurityException {
+    public DocumentResponseDTO createDocument(DocumentCreateDTO documentCreateDTO) throws MinioException, IOException, GeneralSecurityException {
+        boolean isEditable = documentCreateDTO.isEditable();
 
-        if (documentDTO.getCategories() == null || documentDTO.getCategories().isEmpty()) {
-            throw new IllegalArgumentException("Categories cannot be null or empty");
+        if (isEditable) {
+            return this.createDocumentEditable(documentCreateDTO);
         }
+
+        return this.createDocumentNotEditable(documentCreateDTO);
+    }
+
+    public DocumentResponseDTO createDocumentEditable(DocumentCreateDTO documentDTO) {
+        this.verifyCategories(documentDTO.getCategories());
+
+        TypeEntity typeEntity = this.getTypeEntity(documentDTO.getTypeName());
+        UserEntity userEntity = this.getUserEntity(documentDTO.getUsername());
+        List<CategoryEntity> categories = this.getCategoryEntities(documentDTO.getCategories());
+
+        DocumentEntity document = DocumentEntity.builder()
+                .name(documentDTO.getName())
+                .description(documentDTO.getDescription())
+                .state(documentDTO.getState())
+                .content(documentDTO.getContent())
+                .type(typeEntity)
+                .user(userEntity)
+                .isEditable(documentDTO.isEditable())
+                .build();
+        categories.forEach(document::addCategory);
+
+        DocumentEntity savedDocument = documentRepository.save(document);
+        return modelMapper.map(savedDocument, DocumentResponseDTO.class);
+    }
+
+    // Método para crear un nuevo documento y subir el archivo a MinIO
+    public DocumentResponseDTO createDocumentNotEditable(DocumentCreateDTO documentDTO) throws MinioException, IOException, GeneralSecurityException {
+
+        this.verifyCategories(documentDTO.getCategories());
 
         MultipartFile file = documentDTO.getFile();
         String objectName = UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -71,23 +101,14 @@ public class DocumentService {
         document.setDescription(documentDTO.getDescription());
         document.setObjectName(objectName);
         document.setState(DocumentEntity.DocumentState.DRAFT);
+        document.setEditable(documentDTO.isEditable());
+        document.setType(this.getTypeEntity(documentDTO.getTypeName()));
+        document.setUser(this.getUserEntity(documentDTO.getUsername()));
 
-        TypeEntity typeEntity = typeRepository.findByName(documentDTO.getTypeName())
-                .orElseThrow(() -> new NotFoundException("Type not found"));
-        document.setType(typeEntity);
-
-        UserEntity userEntity = userRepository.findByUsername(documentDTO.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
-        document.setUser(userEntity);
-
-        List<CategoryEntity> categories = documentDTO.getCategories().stream()
-                .map(categoryName -> categoryRepository.findByName(categoryName)
-                        .orElseThrow(() -> new NotFoundException("Category not found: " + categoryName)))
-                .toList();
+        List<CategoryEntity> categories = this.getCategoryEntities(documentDTO.getCategories());
         categories.forEach(document::addCategory);
 
         DocumentEntity savedDocument = documentRepository.save(document);
-
         return modelMapper.map(savedDocument, DocumentResponseDTO.class);
     }
 
@@ -207,6 +228,29 @@ public class DocumentService {
 
         // Convertir la entidad document actualizada a DocumentResponseDTO usando ModelMapper
         return modelMapper.map(updatedDocument, DocumentResponseDTO.class);
+    }
+
+    private void verifyCategories(List<String> categories) {
+        if (categories == null || categories.isEmpty()) {
+            throw new IllegalArgumentException("Categories cannot be null or empty");
+        }
+    }
+
+    private TypeEntity getTypeEntity(String name) {
+        return typeRepository.findByName(name)
+                .orElseThrow(() -> new NotFoundException("Type not found"));
+    }
+
+    private UserEntity getUserEntity(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+    }
+
+    private List<CategoryEntity> getCategoryEntities(List<String> categoryNames) {
+        return categoryNames.stream()
+                .map(categoryName -> categoryRepository.findByName(categoryName)
+                        .orElseThrow(() -> new NotFoundException("Category not found: " + categoryName)))
+                .toList();
     }
 
 }
