@@ -40,7 +40,7 @@ public class DocumentEntity {
     @Column(name = "is_editable", nullable = false)
     private boolean isEditable;
 
-    @Column(name = "content")
+    @Column(name = "content", columnDefinition = "MEDIUMTEXT")
     private String content;
 
     @Enumerated(EnumType.STRING)

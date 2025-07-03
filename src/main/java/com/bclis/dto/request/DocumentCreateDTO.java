@@ -39,7 +39,8 @@ public class DocumentCreateDTO {
 
 
     @Schema(description = "File to be uploaded, representing the document content",
-            type = "string")
+            type = "string",
+            format = "binary")
     private MultipartFile file;
 
 
