@@ -100,7 +100,7 @@ public class DocumentService {
         document.setName(documentDTO.getName());
         document.setDescription(documentDTO.getDescription());
         document.setObjectName(objectName);
-        document.setState(DocumentEntity.DocumentState.DRAFT);
+        document.setState(documentDTO.getState());
         document.setEditable(documentDTO.isEditable());
         document.setType(this.getTypeEntity(documentDTO.getTypeName()));
         document.setUser(this.getUserEntity(documentDTO.getUsername()));
