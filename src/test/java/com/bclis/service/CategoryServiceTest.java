@@ -48,7 +48,6 @@ class CategoryServiceTest {
 
         when(categoryRepository.findAll()).thenReturn(Arrays.asList(category1, category2));
 
-        // Llamada al método de servicio
         List<String> categories = categoryService.getAllCategories();
 
         // Aserciones
