@@ -21,12 +21,21 @@ public class DocumentCreateDTO {
             maxLength = 100)
     private String name;
 
-
     @Schema(description = "Description of the document",
             example = "Detailed project proposal document for Q1 2024",
             type = "string",
             maxLength = 500)
     private String description;
+
+
+    @Schema(description = "Editable document content",
+            type = "string")
+    private String content;
+
+
+    @Schema(description = "Indicates whether a document is editable",
+            type = "boolean")
+    private boolean isEditable;
 
 
     @Schema(description = "File to be uploaded, representing the document content",

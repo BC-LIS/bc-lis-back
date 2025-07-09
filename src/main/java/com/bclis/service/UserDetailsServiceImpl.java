@@ -181,6 +181,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserResponseDTO updateUserRole(String username, EnumRole newRoleName) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+
         String userRoleName = user.getRole().getRoleName().name();
 
         if (newRoleName.name().equals(EnumRole.ADMIN.name())) {

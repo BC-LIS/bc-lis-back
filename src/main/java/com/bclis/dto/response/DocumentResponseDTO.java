@@ -17,6 +17,8 @@ public class DocumentResponseDTO {
     private String objectName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String content;
+    private boolean isEditable;
     private DocumentEntity.DocumentState state;
     private TypeResponseDTO type;
     private UserCommentResponseDTO user;

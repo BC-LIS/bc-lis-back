@@ -31,16 +31,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthenticationProvider authenticationProvider) throws Exception {
 
+        final String ADMIN = EnumRole.ADMIN.name();
+
         return httpSecurity
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
+                    // Public Access
                     auth.requestMatchers("/v1/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
-                    auth.requestMatchers("/auth/register").hasRole(EnumRole.ADMIN.name());
-                    auth.requestMatchers(HttpMethod.GET, "/users").hasRole(EnumRole.ADMIN.name());
-                    auth.requestMatchers(HttpMethod.PATCH, "/users/role").hasRole(EnumRole.ADMIN.name());
-                    auth.requestMatchers(HttpMethod.PATCH, "/users/**").authenticated();
                     auth.requestMatchers("/auth/login").permitAll();
+
+                    // Admin Access
+                    auth.requestMatchers("/auth/register").hasRole(ADMIN);
+                    auth.requestMatchers(HttpMethod.GET, "/users").hasRole(ADMIN);
+                    auth.requestMatchers(HttpMethod.PATCH, "/users/role").hasRole(ADMIN);
+
+                    // Global Access
+                    auth.requestMatchers(HttpMethod.PATCH, "/users/**").authenticated();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

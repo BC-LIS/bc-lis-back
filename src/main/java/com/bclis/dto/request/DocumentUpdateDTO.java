@@ -2,6 +2,7 @@ package com.bclis.dto.request;
 
 import com.bclis.persistence.entity.DocumentEntity.DocumentState;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,6 +27,9 @@ public class DocumentUpdateDTO {
             type = "string",
             maxLength = 500)
     private String description;
+
+    @Column(name = "content")
+    private String content;
 
     @Schema(description = "Updated state of the document",
             example = "PUBLISHED",
